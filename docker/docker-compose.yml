@@ -1,0 +1,74 @@
+version: '3.3'
+services:
+  db:
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - db:/var/lib/db/data/
+    ports:
+      - '5432:5432'
+    env_file:
+      - ../.env
+  cache:
+    image: redis:7.2-rc2-bookworm
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache:/var/lib/redis/data
+  queue:
+    image: rabbitmq:3.9.29
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+    env_file:
+      - ../.env
+  factory_clients:
+    build: ../factory_clients
+    restart: always
+    command: >
+      bash -c "python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput &&
+      gunicorn --bind 0.0.0.0:8000 factory_clients.wsgi"
+    volumes:
+      - static_value:/app/static/
+      - media_value:/app/media/
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    env_file:
+      - ../.env
+  nginx:
+    image: nginx:1.19.3
+    restart: always
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
+      - factory_clients
+  minio:
+    image: bitnami/minio:2023.6.23-debian-11-r2
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/var/lib/bitnami/data
+volumes:
+  static_value:
+  media_value:
+  # вечный том
+  db:
+  rabbitmq_data:
+  rabbitmq_logs:
+  cache:
+    driver: local
+  minio_data:
+    driver: local
