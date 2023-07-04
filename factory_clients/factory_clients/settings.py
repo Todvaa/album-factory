@@ -1,7 +1,6 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,15 +23,12 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'studio_client.Studio'
 
 AUTHENTICATION_BACKENDS = [
-    # 'backends.StudioBackend',
-    # 'backends.OrderBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'api',
     'studio_client',
     'customer_client',
     'django.contrib.admin',
@@ -42,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'djoser'
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -100,20 +96,17 @@ REST_FRAMEWORK = {
     ],
 }
 
-# todo: настроить smtp для отправки сообщений
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your-smtp-server.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@example.com'
-EMAIL_HOST_PASSWORD = 'your-email-password'
+# # todo: настроить smtp для отправки сообщений
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'your-smtp-server.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@example.com'
+# EMAIL_HOST_PASSWORD = 'your-email-password'
 
-DJOSER = {
-    'HIDE_USERS': False,
-    'LOGIN_FIELD': 'email',
-    'SEND_CONFIRMATION_EMAIL': True,
-}
-
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+CONF_EMAIL_TEST = 'test@test.ru'
 
 
 # Password validation
@@ -134,6 +127,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

@@ -1,7 +1,18 @@
+from datetime import timedelta
+from enum import Enum
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import EmailValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+
+from .contants import CODE_LIFETIME
+
+
+class ConfirmationType(Enum):
+    RESET = 'reset'
+    SIGNUP = 'signup'
 
 
 class StudioManager(BaseUserManager):
@@ -69,3 +80,42 @@ class Studio(AbstractUser):
         return (
             f'{self.id} / {self.name} / {self.email}'
         )
+
+
+class ConfirmationCode(models.Model):
+    email = models.EmailField(
+        max_length=255,
+        validators=(EmailValidator(message='Incorrect email'),)
+    )
+    code = models.CharField(
+        max_length=10,
+        blank=False,
+        null=False,
+    )
+    date = models.DateTimeField(auto_now_add=True)
+    action_type = models.CharField(
+        max_length=10,
+        choices=[(type.value, type.value) for type in ConfirmationType],
+        null=False,
+        blank=False
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('email', 'action_type', ),
+                name='unique pair'
+            )
+        ]
+        ordering = ['id']
+
+    def __str__(self):
+        return (
+            f'{self.id} / {self.email} / {self.code} / {self.date}'
+        )
+
+    def valid_code(self) -> bool:
+        # x = timezone.now()
+        # y = self.date
+        # z = (timezone.now() - self.date)
+        return (timezone.now() - self.date) < timedelta(minutes=CODE_LIFETIME)
