@@ -13,8 +13,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import ConfirmationCode, Studio
 from .serializers import ConfirmationSendSerializer, SignUpSerializer
+from .utils import generate_random_code
 
-EMAIL_CODE = os.getenv('EMAIL_CODE')
+APP_ENV = os.getenv('APP_ENV')
 
 
 class StudioSignUpView(APIView):
@@ -55,19 +56,20 @@ class ConfirmationSendView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         action_type = serializer.validated_data.get('action_type')
-
+        x = APP_ENV == 'dev'
+        email_code = '000-000' if APP_ENV == 'dev' else generate_random_code()
         ConfirmationCode.objects.update_or_create(
             email=email,
             action_type=action_type,
             defaults={
-                'code': EMAIL_CODE,
+                'code': email_code,
                 'date': timezone.now()
             }
         )
 
         send_mail(
             subject='Album Factory регистрация',
-            message=f'Код подтверждения: {EMAIL_CODE}',
+            message=f'Код подтверждения: {email_code}',
             from_email=settings.CONF_EMAIL_TEST,
             recipient_list=[email]
         )

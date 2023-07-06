@@ -18,12 +18,12 @@ class SignUpSerializer(serializers.Serializer):
         try:
             confirmation_code = ConfirmationCode.objects.get(
                 email=email,
-                code=code,
                 action_type='signup'
             )
         except ConfirmationCode.DoesNotExist:
-            raise serializers.ValidationError('Неверный код или почта')
-        x = confirmation_code.valid_code()
+            raise serializers.ValidationError('Неверно указана почта')
+        if confirmation_code.code != code:
+            raise serializers.ValidationError('Неверный код')
         if not confirmation_code.valid_code():
             raise serializers.ValidationError('Срок действия кода истек')
 

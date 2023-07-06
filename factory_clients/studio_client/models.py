@@ -7,7 +7,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-from .contants import CODE_LIFETIME
+from .constants import CODE_LIFETIME
 
 
 class ConfirmationType(Enum):
@@ -20,6 +20,8 @@ class StudioManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError('The given email must be set')
+        if not password:
+            raise ValueError('The given password must be set')
         email = self.normalize_email(email)
         studio = self.model(email=email, **extra_fields)
         studio.set_password(password)
@@ -115,7 +117,4 @@ class ConfirmationCode(models.Model):
         )
 
     def valid_code(self) -> bool:
-        # x = timezone.now()
-        # y = self.date
-        # z = (timezone.now() - self.date)
         return (timezone.now() - self.date) < timedelta(minutes=CODE_LIFETIME)
