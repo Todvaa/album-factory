@@ -56,7 +56,7 @@ class ConfirmationSendView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         action_type = serializer.validated_data.get('action_type')
-        email_code = '000-000' if APP_ENV == 'dev' else generate_random_code()
+        email_code = '000000' if APP_ENV == 'dev' else generate_random_code()
         ConfirmationCode.objects.update_or_create(
             email=email,
             action_type=action_type,

@@ -19,9 +19,9 @@ class StudioManager(BaseUserManager):
 
     def _create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError('The given email must be set')
+            raise ValueError('Необходимо указать почту')
         if not password:
-            raise ValueError('The given password must be set')
+            raise ValueError('Необходимо указать пароль')
         email = self.normalize_email(email)
         studio = self.model(email=email, **extra_fields)
         studio.set_password(password)
@@ -90,7 +90,7 @@ class ConfirmationCode(models.Model):
         validators=(EmailValidator(message='Incorrect email'),)
     )
     code = models.CharField(
-        max_length=10,
+        max_length=6,
         blank=False,
         null=False,
     )
