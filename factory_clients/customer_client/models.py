@@ -1,6 +1,5 @@
 from enum import Enum
-import rest_framework_simplejwt.tokens
-from django.contrib.auth.models import AbstractUser
+
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -13,6 +12,22 @@ class OrderStatus(Enum):
     agreement = 'Согласование'
     printing = 'Печать'
     completed = 'Завершен'
+
+
+class School(models.Model):
+    full_name = models.CharField(
+        max_length=255,
+        blank=False,
+        null=False,
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return (
+            f'{self.id} / {self.full_name}'
+        )
 
 
 class Order(models.Model):
@@ -77,6 +92,13 @@ class Order(models.Model):
         on_delete=models.CASCADE,
         related_name='order'
     )
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name='order',
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ['id']
@@ -84,4 +106,46 @@ class Order(models.Model):
     def __str__(self):
         return (
             f'{self.id} / {self.customer_last_name} / {self.class_index}'
+        )
+
+
+class PersonStaff(models.Model):
+    last_name = models.CharField(
+        max_length=150,
+        blank=False,
+        null=False,
+    )
+    first_name = models.CharField(
+        max_length=150,
+        blank=False,
+        null=False,
+    )
+    middle_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+    )
+    school_subject = models.CharField(
+        max_length=150,
+        blank=False,
+        null=False,
+    )
+    photo = models.ImageField(
+        upload_to='person_staff_photo/',
+        blank=False,
+        null=False,
+    )
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name='person_staff'
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return (
+            f'{self.last_name} / {self.school.full_name}'
+            f' / {self.school_subject}'
         )
