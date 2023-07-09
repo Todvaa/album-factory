@@ -6,7 +6,7 @@ from tests.factory_clients.factories import SchoolFactory, StudioFactory
 from tests.utils import client
 
 
-class SchoolDetailTests(APITestCase):
+class SchoolCreateTests(APITestCase):
     @pytest.mark.django_db
     def test_valid(self):
         school = SchoolFactory.build()
