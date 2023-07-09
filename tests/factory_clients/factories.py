@@ -3,6 +3,7 @@ from random import randint
 import factory
 from faker import Faker
 
+from customer_client.models import School
 from studio_client.models import Studio, ConfirmationCode
 
 
@@ -26,3 +27,10 @@ class ConfirmationCodeFactory(factory.django.DjangoModelFactory):
     code = randint(100000, 999999)
     action_type = factory.Iterator(['signup', 'reset'])
     email = factory.LazyAttribute(lambda _: Faker().unique.email())
+
+
+class SchoolFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = School
+
+    full_name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))
