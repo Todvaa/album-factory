@@ -6,11 +6,9 @@ from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework.generics import GenericAPIView
-from rest_framework.schemas.openapi import AutoSchema
-from rest_framework.serializers import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import ConfirmationCode, Studio
@@ -38,9 +36,9 @@ class StudioSignUpView(GenericAPIView):
                 name=name
             )
         except IntegrityError:
-            raise ValidationError(
-                'Ошибка при регистрации, почта уже используется'
-            )
+            raise ValidationError({
+                'error': 'Ошибка при регистрации, почта уже используется'
+            })
 
         refresh = RefreshToken.for_user(studio)
         response_data = {
