@@ -19,4 +19,4 @@ class SchoolDetailTests(APITestCase):
         school = SchoolFactory()
         response = client.get('/studio/school/' + (school.id + 1) + '/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    #     check response.data
+    #     todo: check response.data
