@@ -1,4 +1,4 @@
-# album_factory
+# Album Factory
 ## Описание
 В проекте настроен docker-compose, что упрощает начало работы
 ## Запуск
@@ -20,3 +20,12 @@ RABBITMQ_DEFAULT_PASS=album_factory
 ```
 3. Собрать контейнеры. Запуск из папки docker.  
 <br><pre>docker-compose up --build</pre><br>
+
+## Документация OpenApi 3
+Генерация локального файла:
+```commandline
+./factory_clients/manage.py generateschema --file ../api.yml
+```
+Веб интерфейс: http://localhost/openapi
+
+JSON формат: http://localhost/openapi/?format=openapi-json

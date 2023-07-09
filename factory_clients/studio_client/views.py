@@ -5,6 +5,8 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.utils import timezone
+from rest_framework.generics import GenericAPIView
+from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.serializers import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -18,8 +20,9 @@ from .utils import generate_random_code
 APP_ENV = os.getenv('APP_ENV')
 
 
-class StudioSignUpView(APIView):
+class StudioSignUpView(GenericAPIView):
     permission_classes = (AllowAny, )
+    serializer_class = SignUpSerializer
 
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
@@ -48,8 +51,9 @@ class StudioSignUpView(APIView):
         return Response(response_data)
 
 
-class ConfirmationSendView(APIView):
+class ConfirmationSendView(GenericAPIView):
     permission_classes = (AllowAny, )
+    serializer_class = ConfirmationSendSerializer
 
     def post(self, request):
         serializer = ConfirmationSendSerializer(data=request.data)
@@ -75,7 +79,8 @@ class ConfirmationSendView(APIView):
 
         response_data = {
             'success': True,
-            # Для чего это?
+            # todo: потом надо сделать проверку что если код отправлен менее retryTimeout, то повторный код не
+            #  отправляем и соответственно выводим время сколько осталось до нового кода
             'retryTimeout': 60
         }
 
