@@ -6,7 +6,7 @@ from tests.factory_clients.factories import SchoolFactory
 from tests.utils import client
 
 
-class ConfirmationTests(APITestCase):
+class SchoolListTests(APITestCase):
     @pytest.mark.django_db
     def test_default(self):
         SchoolFactory.create_batch(50)

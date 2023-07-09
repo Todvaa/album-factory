@@ -33,4 +33,4 @@ class SchoolFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = School
 
-    full_name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))
+    name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))
