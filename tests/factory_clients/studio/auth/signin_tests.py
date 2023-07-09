@@ -6,7 +6,7 @@ from tests.factory_clients.factories import StudioFactory
 from tests.utils import client
 
 
-class SignupTests(APITestCase):
+class SigninTests(APITestCase):
     @pytest.mark.django_db
     def test_valid(self):
         studio = StudioFactory()
