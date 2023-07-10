@@ -21,11 +21,11 @@ class SignUpSerializer(serializers.Serializer):
                 action_type='signup'
             )
         except ConfirmationCode.DoesNotExist:
-            raise serializers.ValidationError('Неверно указана почта')
+            raise serializers.ValidationError({'email': ['Неверно указана почта']})
         if confirmation_code.code != code:
-            raise serializers.ValidationError('Неверный код')
+            raise serializers.ValidationError({'code': ['Неверный код']})
         if not confirmation_code.valid_code():
-            raise serializers.ValidationError('Срок действия кода истек')
+            raise serializers.ValidationError({'code': ['Срок действия кода истек']})
 
         return data
 

@@ -1,8 +1,14 @@
+from datetime import timedelta, datetime
+
 import pytest
+from django.utils import timezone
+from django.utils.timezone import make_aware
+from faker import Faker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from studio_client.models import Studio
+
 from tests.factory_clients.factories import ConfirmationCodeFactory, StudioFactory
 from tests.utils import fake, client
 
@@ -67,7 +73,6 @@ class SignupTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Ошибка при регистрации, почта уже используется'})
 
-    # todo: fix
     @pytest.mark.django_db
     def test_invalid_code(self):
         confirmation_code = ConfirmationCodeFactory(action_type='signup', code=123456)
@@ -78,4 +83,15 @@ class SignupTests(APITestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'code': ['Неверный код']})
+        self.assertEqual(Studio.objects.count(), 0)
+
+    @pytest.mark.django_db
+    def test_non_existent_email(self):
+        response = client.post('/studio/auth/signup/', {
+            'email': Faker().unique.email(),
+            'code': 654321,
+            'password': fake.password()
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'email': ['Неверно указана почта']})
         self.assertEqual(Studio.objects.count(), 0)

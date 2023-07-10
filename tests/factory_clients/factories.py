@@ -1,6 +1,9 @@
+from datetime import datetime
 from random import randint
 
 import factory
+from django.utils import timezone
+from django.utils.timezone import make_aware
 from faker import Faker
 
 from customer_client.models import School
