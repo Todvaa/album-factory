@@ -1,9 +1,8 @@
-from datetime import datetime
 from random import randint
 
 import factory
+from django.db import models
 from django.utils import timezone
-from django.utils.timezone import make_aware
 from faker import Faker
 
 from studio_client.models import Studio, ConfirmationCode
@@ -29,3 +28,15 @@ class ConfirmationCodeFactory(factory.django.DjangoModelFactory):
     code = randint(100000, 999999)
     action_type = factory.Iterator(['signup', 'reset'])
     email = factory.LazyAttribute(lambda _: Faker().unique.email())
+    date = factory.LazyAttribute(lambda _: timezone.now())
+
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+        date = kwargs.pop('date', None)
+        code = super()._create(target_class, *args, **kwargs)
+
+        if date is not None:
+            code.date = date
+            models.Model.save(code)
+
+        return code
