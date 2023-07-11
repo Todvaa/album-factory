@@ -12,11 +12,11 @@ class SchoolDetailTests(APITestCase):
         school = SchoolFactory()
         response = client.get('/studio/school/' + str(school.id) + '/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': school.id, 'name': school.name})
+        self.assertEqual(response.data, {'id': school.id, 'full_name': school.full_name})
 
     @pytest.mark.django_db
-    def test_default(self):
+    def test_not_found(self):
         school = SchoolFactory()
         response = client.get('/studio/school/' + str(school.id + 1) + '/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    #     todo: check response.data
+        self.assertEqual(response.data, {'detail': 'Not found.'})
