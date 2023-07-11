@@ -1,6 +1,7 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from faker import Faker
@@ -94,4 +95,20 @@ class SignupTests(APITestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'email': ['Неверно указана почта']})
+        self.assertEqual(Studio.objects.count(), 0)
+
+    @pytest.mark.django_db
+    def test_outdated_code(self):
+        confirmation_code = ConfirmationCodeFactory(
+            action_type='signup', date=make_aware(
+                datetime.now() - relativedelta(years=1), timezone.utc
+            )
+        )
+        response = client.post('/studio/auth/signup/', {
+            'email': confirmation_code.email,
+            'code': confirmation_code.code,
+            'password': fake.password()
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'code': ['Срок действия кода истек']})
         self.assertEqual(Studio.objects.count(), 0)

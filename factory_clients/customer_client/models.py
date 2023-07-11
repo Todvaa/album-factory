@@ -14,22 +14,6 @@ class OrderStatus(Enum):
     completed = 'Завершен'
 
 
-class School(models.Model):
-    full_name = models.CharField(
-        max_length=255,
-        blank=False,
-        null=False,
-    )
-
-    class Meta:
-        ordering = ['id']
-
-    def __str__(self):
-        return (
-            f'{self.id} / {self.full_name}'
-        )
-
-
 class Order(models.Model):
     class_index = models.CharField(
         max_length=4,
@@ -93,7 +77,7 @@ class Order(models.Model):
         related_name='order'
     )
     school = models.ForeignKey(
-        School,
+        'studio_client.School',
         on_delete=models.CASCADE,
         related_name='order',
         blank=True,
@@ -136,7 +120,7 @@ class PersonStaff(models.Model):
         null=False,
     )
     school = models.ForeignKey(
-        School,
+        'studio_client.School',
         on_delete=models.CASCADE,
         related_name='person_staff'
     )

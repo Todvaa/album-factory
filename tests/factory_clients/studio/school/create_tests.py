@@ -12,17 +12,17 @@ class SchoolCreateTests(APITestCase):
         school = SchoolFactory.build()
         client.force_authenticate(user=StudioFactory)
         response = client.post('/studio/school/', {
-            'name': school.name
+            'full_name': school.full_name
         })
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'id': school.id, 'name': school.name})
+        self.assertEqual(response.data, {'id': school.id, 'full_name': school.full_name})
 
     @pytest.mark.django_db
     def test_empty_name(self):
         client.force_authenticate(user=StudioFactory)
         response = client.post('/studio/school/', {
-            'name': ''
+            'full_name': ''
         })
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -33,7 +33,7 @@ class SchoolCreateTests(APITestCase):
     def test_none_name(self):
         client.force_authenticate(user=StudioFactory)
         response = client.post('/studio/school/', {
-            'name': ''
+            'full_name': ''
         })
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -43,7 +43,7 @@ class SchoolCreateTests(APITestCase):
     @pytest.mark.django_db
     def test_unauthenticated(self):
         response = client.post('/studio/school/', {
-            'name': ''
+            'full_name': ''
         })
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

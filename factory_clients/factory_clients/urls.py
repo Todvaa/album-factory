@@ -9,10 +9,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('studio/', include('studio_client.urls', namespace='studio_client')),
     path('openapi/', get_schema_view(
-            title="Album Factory",
-            description="External API for studio and customer clients",
-            version="dev",
-            permission_classes = (AllowAny, ),
+            title='Album Factory',
+            description='External API for studio and customer clients',
+            version='dev',
+            permission_classes=(AllowAny, ),
         ), name='openapi-schema'),
 ]
 

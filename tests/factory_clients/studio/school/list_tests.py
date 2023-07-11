@@ -19,7 +19,7 @@ class SchoolListTests(APITestCase):
     def test_search(self):
         SchoolFactory.create_batch(50)
         SchoolFactory(full_name='Гимназия 666')
-        response = client.get('/studio/school?name=гимнАзия/')
+        response = client.get('/studio/school?search=гимнАзия/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.count, 1)
         self.assertEqual(response.data.result.count(), 1)
@@ -27,7 +27,7 @@ class SchoolListTests(APITestCase):
     @pytest.mark.django_db
     def test_not_found(self):
         SchoolFactory.create_batch(50)
-        response = client.get('/studio/school?name=гимнАзия/')
+        response = client.get('/studio/school?search=гимнАзия/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.count, 0)
         self.assertEqual(response.data.result.count(), 0)
