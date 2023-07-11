@@ -10,7 +10,7 @@ class SchoolDetailTests(APITestCase):
     @pytest.mark.django_db
     def test_default(self):
         school = SchoolFactory()
-        response = client.get('/studio/school/' + school.id + '/')
+        response = client.get('/studio/school/' + str(school.id) + '/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'id': school.id, 'name': school.name})
 
