@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from faker import Faker
 
-from studio_client.models import Studio, ConfirmationCode
+from studio_client.models import Studio, ConfirmationCode, School
 
 
 # see https://factoryboy.readthedocs.io/en/stable/index.html
@@ -40,3 +40,10 @@ class ConfirmationCodeFactory(factory.django.DjangoModelFactory):
             models.Model.save(code)
 
         return code
+
+
+class SchoolFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = School
+
+    full_name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))

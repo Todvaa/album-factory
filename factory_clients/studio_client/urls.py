@@ -1,10 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import StudioSignUpView, ConfirmationSendView
+from .views import StudioSignUpView, ConfirmationSendView, SchoolViewSet
 
 app_name = 'studio_client'
 
+router = DefaultRouter()
+
+router.register(r'school', SchoolViewSet, basename='school')
 
 urlpatterns = [
     path(
@@ -15,5 +19,6 @@ urlpatterns = [
     path('auth/signup/', StudioSignUpView.as_view(), name='sign_up'),
     path('auth/signin/', TokenObtainPairView.as_view(), name='get_token'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('', include(router.urls)),
 
 ]
