@@ -118,3 +118,19 @@ class ConfirmationCode(models.Model):
 
     def valid_code(self) -> bool:
         return (timezone.now() - self.date) < timedelta(minutes=CODE_LIFETIME)
+
+
+class School(models.Model):
+    full_name = models.CharField(
+        max_length=255,
+        blank=False,
+        null=False,
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return (
+            f'{self.id} / {self.full_name}'
+        )

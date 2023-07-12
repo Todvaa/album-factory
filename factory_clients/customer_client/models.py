@@ -6,28 +6,15 @@ from django.db import models
 
 class OrderStatus(Enum):
     created = 'Создан'
+    portraits_uploading = 'Загрузка портретов'
     portraits_uploaded = 'Портреты загружены'
+    portraits_processing = 'Обработка портретов'
     portraits_processed = 'Портреты обработаны'
     layout = 'Верстка'
     agreement = 'Согласование'
     printing = 'Печать'
     completed = 'Завершен'
-
-
-class School(models.Model):
-    full_name = models.CharField(
-        max_length=255,
-        blank=False,
-        null=False,
-    )
-
-    class Meta:
-        ordering = ['id']
-
-    def __str__(self):
-        return (
-            f'{self.id} / {self.full_name}'
-        )
+    rejected = 'Отменен'
 
 
 class Order(models.Model):
@@ -93,7 +80,7 @@ class Order(models.Model):
         related_name='order'
     )
     school = models.ForeignKey(
-        School,
+        'studio_client.School',
         on_delete=models.CASCADE,
         related_name='order',
         blank=True,
@@ -136,7 +123,7 @@ class PersonStaff(models.Model):
         null=False,
     )
     school = models.ForeignKey(
-        School,
+        'studio_client.School',
         on_delete=models.CASCADE,
         related_name='person_staff'
     )

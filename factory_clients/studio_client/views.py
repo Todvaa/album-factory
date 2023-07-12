@@ -5,14 +5,16 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.utils import timezone
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import ConfirmationCode, Studio
-from .serializers import ConfirmationSendSerializer, SignUpSerializer
+from .mixins import CreateRetrieveListViewSet
+from .models import ConfirmationCode, Studio, School
+from .serializers import ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer
 from .utils import generate_random_code
 
 APP_ENV = os.getenv('APP_ENV')
@@ -83,3 +85,11 @@ class ConfirmationSendView(GenericAPIView):
         }
 
         return Response(response_data)
+
+
+class SchoolViewSet(CreateRetrieveListViewSet):
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+    permission_classes = (IsAuthenticated, )
+    filter_backends = (SearchFilter, )
+    search_fields = ('full_name', )

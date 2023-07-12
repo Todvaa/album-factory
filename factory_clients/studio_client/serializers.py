@@ -1,7 +1,7 @@
 from django.core.validators import validate_email
 from rest_framework import serializers
 
-from .models import ConfirmationCode
+from .models import ConfirmationCode, School
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -37,3 +37,12 @@ class ConfirmationSendSerializer(serializers.Serializer):
     action_type = serializers.ChoiceField(
         choices=('signup', 'reset'), required=True
     )
+
+
+class SchoolSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = School
+        fields = (
+            'id', 'full_name',
+        )

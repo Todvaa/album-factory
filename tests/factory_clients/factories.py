@@ -5,8 +5,8 @@ from django.db import models
 from django.utils import timezone
 
 from customer_client.models import Order, OrderStatus
-from studio_client.models import Studio, ConfirmationCode
 from tests.utils import fake
+from studio_client.models import Studio, ConfirmationCode, School
 
 
 # see https://factoryboy.readthedocs.io/en/stable/index.html
@@ -58,3 +58,10 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     studio = factory.SubFactory(StudioFactory)
     school = factory.SubFactory(SchoolFactory)
+
+
+class SchoolFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = School
+
+    full_name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))
