@@ -6,12 +6,15 @@ from django.db import models
 
 class OrderStatus(Enum):
     created = 'Создан'
+    portraits_uploading = 'Загрузка портретов'
     portraits_uploaded = 'Портреты загружены'
+    portraits_processing = 'Обработка портретов'
     portraits_processed = 'Портреты обработаны'
     layout = 'Верстка'
     agreement = 'Согласование'
     printing = 'Печать'
     completed = 'Завершен'
+    rejected = 'Отменен'
 
 
 class Order(models.Model):
