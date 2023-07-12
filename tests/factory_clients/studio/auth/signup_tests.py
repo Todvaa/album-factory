@@ -1,15 +1,13 @@
 from datetime import datetime
-
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
-from django.utils.timezone import make_aware
 from faker import Faker
+
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from studio_client.models import Studio
-
 from tests.factory_clients.factories import ConfirmationCodeFactory, StudioFactory
 from tests.utils import fake, client
 
@@ -100,7 +98,7 @@ class SignupTests(APITestCase):
     @pytest.mark.django_db
     def test_outdated_code(self):
         confirmation_code = ConfirmationCodeFactory(
-            action_type='signup', date=make_aware(
+            action_type='signup', date=timezone.make_aware(
                 datetime.now() - relativedelta(years=1), timezone.utc
             )
         )
