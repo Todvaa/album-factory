@@ -1,12 +1,13 @@
 from django.core.validators import validate_email
 from rest_framework import serializers
 
+from customer_client.models import Order, OrderStatus
 from .models import ConfirmationCode, School
 
 
 class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(
-        max_length=255, required=True, validators=(validate_email, )
+        max_length=255, required=True, validators=(validate_email,)
     )
     password = serializers.CharField(max_length=150, required=True)
     code = serializers.CharField(max_length=10, required=True)
@@ -32,7 +33,7 @@ class SignUpSerializer(serializers.Serializer):
 
 class ConfirmationSendSerializer(serializers.Serializer):
     email = serializers.EmailField(
-        max_length=255, required=True, validators=(validate_email, )
+        max_length=255, required=True, validators=(validate_email,)
     )
     action_type = serializers.ChoiceField(
         choices=('signup', 'reset'), required=True
@@ -40,9 +41,34 @@ class ConfirmationSendSerializer(serializers.Serializer):
 
 
 class SchoolSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = School
         fields = (
             'id', 'full_name',
         )
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = (
+            'id', 'class_index', 'customer_first_name', 'customer_last_name',
+            'customer_middle_name', 'phone_number', 'albums_count',
+            'passcode', 'status', 'studio', 'school'
+        )
+        read_only_fields = (
+            'studio',
+        )
+
+    def validate_status(self, value):
+        if (
+                value == OrderStatus.rejected.value
+                or value == OrderStatus.completed.value
+                or (
+                self.instance.status == OrderStatus.layout.value
+                and value == OrderStatus.agreement.value
+        )
+        ):
+            return value
+        else:
+            raise serializers.ValidationError("Недопустимое изменение статуса")

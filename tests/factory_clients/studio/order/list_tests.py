@@ -8,19 +8,41 @@ from tests.utils import client
 
 
 class DetailTests(APITestCase):
-    # todo: same as in school
     @pytest.mark.django_db
     def test_default(self):
         order = OrderFactory()
         client.force_login(order.studio)
         response = client.get('/studio/order/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual({id: 1}, response.data)  # todo: check all fields
+        self.assertEqual({
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": order.id,
+                    "class_index": order.class_index,
+                    "customer_first_name": order.customer_first_name,
+                    "customer_last_name": order.customer_last_name,
+                    "customer_middle_name": order.customer_middle_name,
+                    "phone_number": order.phone_number,
+                    "albums_count": order.albums_count,
+                    "passcode": order.passcode,
+                    "status": order.status,
+                    "studio": order.studio.id,
+                    "school": order.school.id,
+                },
+            ]
+        }, response.data)
 
     @pytest.mark.django_db
     def test_unauthorized(self):
-        order = OrderFactory()
+        OrderFactory()
+        client.force_authenticate(user=None)
         response = client.get('/studio/order/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual({'detail': 'error'}, response.data)  # todo: write a normal error
-        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(
+            response.data,
+            {'detail': 'Authentication credentials were not provided.'}
+        )
+        self.assertEqual(Order.objects.count(), 1)

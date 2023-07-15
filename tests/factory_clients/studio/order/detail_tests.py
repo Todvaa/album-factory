@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from customer_client.models import Order
+from customer_client.models import Order, OrderStatus
 from tests.factory_clients.factories import OrderFactory
 from tests.utils import client
 
@@ -11,24 +11,40 @@ class DetailTests(APITestCase):
     @pytest.mark.django_db
     def test_default(self):
         order = OrderFactory()
-        client.force_login(order.studio)
-        response = client.get('/studio/order/' + order.id)
+        client.force_authenticate(user=order.studio)
+        response = client.get(f'/studio/order/{order.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual({id: 1}, response.data)  # todo: check all fields
+        self.assertEqual({
+            'id': order.id,
+            'class_index': order.class_index,
+            'customer_first_name': order.customer_first_name,
+            'customer_last_name': order.customer_last_name,
+            'customer_middle_name': order.customer_middle_name,
+            'phone_number': order.phone_number,
+            'albums_count': order.albums_count,
+            'passcode': order.passcode,
+            'status': OrderStatus.created.value,
+            'school': order.school.id,
+            'studio': order.studio.id,
+        }, response.data)
 
     @pytest.mark.django_db
     def test_unauthorized(self):
         order = OrderFactory()
-        response = client.get('/studio/order/' + order.id)
+        client.force_authenticate(user=None)
+        response = client.get(f'/studio/order/{order.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual({'detail': 'error'}, response.data)  # todo: write a normal error
-        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(
+            response.data,
+            {'detail': 'Authentication credentials were not provided.'}
+        )
+        self.assertEqual(Order.objects.count(), 1)
 
     @pytest.mark.django_db
     def test_unauthorized_order(self):
         order = OrderFactory()
-        client.force_login(order.studio)
+        client.force_authenticate(user=order.studio)
         another_order = OrderFactory()
-        response = client.get('/studio/order/' + another_order.id)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual({'detail': 'error'}, response.data)  # todo: write a normal error
+        response = client.get(f'/studio/order/{another_order.id}/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual({'detail': 'Not found.'}, response.data)

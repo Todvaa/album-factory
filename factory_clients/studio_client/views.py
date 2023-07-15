@@ -12,16 +12,21 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .mixins import CreateRetrieveListViewSet
+from customer_client.models import Order
+from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
 from .models import ConfirmationCode, Studio, School
-from .serializers import ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer
+from .permissions import IsOwner
+from .serializers import (
+    ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
+    OrderSerializer
+)
 from .utils import generate_random_code
 
 APP_ENV = os.getenv('APP_ENV')
 
 
 class StudioSignUpView(GenericAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = SignUpSerializer
 
     def post(self, request):
@@ -52,7 +57,7 @@ class StudioSignUpView(GenericAPIView):
 
 
 class ConfirmationSendView(GenericAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = ConfirmationSendSerializer
 
     def post(self, request):
@@ -90,6 +95,17 @@ class ConfirmationSendView(GenericAPIView):
 class SchoolViewSet(CreateRetrieveListViewSet):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
-    permission_classes = (IsAuthenticated, )
-    filter_backends = (SearchFilter, )
-    search_fields = ('full_name', )
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('full_name',)
+
+
+class OrderViewSet(CreateRetrieveListUpdateViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = (IsOwner & IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        serializer.save(studio=self.request.user)
+
+    def get_queryset(self):
+        return Order.objects.filter(studio=self.request.user)
