@@ -23,7 +23,7 @@ class DetailTests(APITestCase):
             'phone_number': order.phone_number,
             'albums_count': order.albums_count,
             'passcode': order.passcode,
-            'status': OrderStatus.created.value,
+            'status': OrderStatus.created.name,
             'school': order.school.id,
             'studio': order.studio.id,
         }, response.data)

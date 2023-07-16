@@ -1,4 +1,5 @@
 import pytest
+from parameterized import parameterized
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -12,18 +13,22 @@ from tests.utils import client
 # data provider
 def get_status_cases():
     # Allowed only:
-    # Any => completed Maybe rejected later
+    # While creating => crated
+    # Any => rejected
     # layout => agreement
 
     # init, new, success
-    yield OrderStatus.created.value, OrderStatus.portraits_uploaded.value, False
-    yield OrderStatus.created.value, OrderStatus.portraits_processed.value, False
-    yield OrderStatus.created.value, OrderStatus.layout.value, False
-    yield OrderStatus.created.value, OrderStatus.agreement.value, False
-    yield OrderStatus.created.value, OrderStatus.printing.value, False
-    yield OrderStatus.created.value, OrderStatus.rejected.value, True
-    yield OrderStatus.layout.value, OrderStatus.agreement.value, True
-    yield OrderStatus.printing.value, OrderStatus.completed.value, True
+    yield OrderStatus.created.name, OrderStatus.portraits_uploading.name, False
+    yield OrderStatus.created.name, OrderStatus.portraits_uploaded.name, False
+    yield OrderStatus.created.name, OrderStatus.portraits_processing.name, False
+    yield OrderStatus.created.name, OrderStatus.portraits_processed.name, False
+    yield OrderStatus.created.name, OrderStatus.layout.name, False
+    yield OrderStatus.created.name, OrderStatus.agreement.name, False
+    yield OrderStatus.created.name, OrderStatus.printing.name, False
+    yield OrderStatus.created.name, OrderStatus.completed.name, False
+    yield OrderStatus.created.name, OrderStatus.rejected.name, True
+    yield OrderStatus.layout.name, OrderStatus.agreement.name, True
+    yield OrderStatus.layout.name, OrderStatus.portraits_uploaded.name, False
 
 
 class UpdateTests(APITestCase):
@@ -42,7 +47,7 @@ class UpdateTests(APITestCase):
             'phone_number': order_changed.phone_number,
             'albums_count': order_changed.albums_count,
             'passcode': order_changed.passcode,
-            'status': OrderStatus.rejected.value,
+            'status': OrderStatus.rejected.name,
             'studio': studio.id,
             'school': school.id,
         }
@@ -65,7 +70,7 @@ class UpdateTests(APITestCase):
         self.assertEqual(order_.phone_number, order_changed.phone_number)
         self.assertEqual(order_.albums_count, order_changed.albums_count)
         self.assertEqual(order_.passcode, order_changed.passcode)
-        self.assertEqual(order_.status, OrderStatus.rejected.value)
+        self.assertEqual(order_.status, OrderStatus.rejected.name)
 
         # unchanged
         self.assertEqual(order_.studio.id, order.studio.id)
@@ -92,17 +97,17 @@ class UpdateTests(APITestCase):
         self.assertEqual(response.data, {'detail': 'Not found.'})
 
     @pytest.mark.django_db
-    def test_status(self):
-        for init, new, success in get_status_cases():
-            order = OrderFactory(status=init)
-            client.force_authenticate(user=order.studio)
-            client.patch(f'/studio/order/{order.id}/', {
-                'status': new,
-            })
+    @parameterized.expand(get_status_cases())
+    def test_status(self, init, new, success):
+        order = OrderFactory(status=init)
+        client.force_authenticate(user=order.studio)
+        response = client.patch(f'/studio/order/{order.id}/', {
+            'status': new,
+        })
 
-            self.assertEqual(Order.objects.count(), 1)
-            self.assertEqual(
-                Order.objects.get().status, new if success else init
-            )
-
-            order.delete()
+        self.assertEqual(Order.objects.get().status, new if success else init)
+        self.assertEqual(Order.objects.count(), 1)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK if success else status.HTTP_400_BAD_REQUEST
+        )

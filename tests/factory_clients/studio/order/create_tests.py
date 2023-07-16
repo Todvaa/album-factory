@@ -1,4 +1,5 @@
 import pytest
+from parameterized import parameterized
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -28,7 +29,7 @@ class CreateTests(APITestCase):
             'passcode': response.data['passcode'],
             'phone_number': None,
             'school': None,
-            'status': OrderStatus.created.value,
+            'status': OrderStatus.created.name,
             'studio': studio.id
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -39,7 +40,7 @@ class CreateTests(APITestCase):
         self.assertEqual(order.customer_first_name, order.customer_first_name)
         self.assertEqual(order.customer_last_name, order.customer_last_name)
         self.assertEqual(order.class_index, order.class_index)
-        self.assertEqual(order.status, OrderStatus.created.value)
+        self.assertEqual(order.status, OrderStatus.created.name)
         self.assertGreaterEqual(order.passcode, 100000)
 
     @pytest.mark.django_db
@@ -55,7 +56,6 @@ class CreateTests(APITestCase):
             'phone_number': order.phone_number,
             'albums_count': order.albums_count,
             'passcode': order.passcode,
-            'status': OrderStatus.rejected.value,
             'school': school.id,
         }
         client.force_authenticate(user=studio)
@@ -63,7 +63,8 @@ class CreateTests(APITestCase):
         order_params.update({
             'id': 1,
             'passcode': response.data['passcode'],
-            'studio': studio.id
+            'studio': studio.id,
+            'status': OrderStatus.created.name
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(order_params, response.data)
@@ -78,8 +79,29 @@ class CreateTests(APITestCase):
         self.assertEqual(order.phone_number, order.phone_number)
         self.assertEqual(order.albums_count, order.albums_count)
         self.assertEqual(order.passcode, order.passcode)
-        self.assertEqual(order.status, OrderStatus.rejected.value)
+        self.assertEqual(order.status, OrderStatus.created.name)
         self.assertGreaterEqual(order.passcode, 100000)
+
+    @pytest.mark.django_db
+    @parameterized.expand([status.name for status in OrderStatus])
+    def test_set_status(self, new):
+        studio = StudioFactory()
+        order = OrderFactory.build()
+        client.force_authenticate(user=studio)
+        order_params = {
+            'class_index': order.class_index,
+            'customer_first_name': order.customer_first_name,
+            'customer_last_name': order.customer_last_name,
+            'albums_count': order.albums_count,
+            'status': new,
+        }
+        response = client.post('/studio/order/', data=order_params)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data,
+            {'status': ['Недопустимое изменение статуса']}
+        )
+        self.assertEqual(Order.objects.count(), 0)
 
     @pytest.mark.django_db
     def test_unauthorized(self):

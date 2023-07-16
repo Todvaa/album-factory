@@ -61,7 +61,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     phone_number = factory.LazyAttribute(lambda _: str(randint(9000000000, 9999999999)))
     albums_count = factory.LazyAttribute(lambda _: randint(1, 50))
     passcode = factory.LazyAttribute(lambda _: randint(100000, 999999))
-    status = factory.LazyAttribute(lambda _: OrderStatus.created.value)
+    status = factory.LazyAttribute(lambda _: OrderStatus.created.name)
 
     studio = factory.SubFactory(StudioFactory)
     school = factory.SubFactory(SchoolFactory)

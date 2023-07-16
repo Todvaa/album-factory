@@ -72,8 +72,8 @@ class Order(models.Model):
     )
     status = models.CharField(
         max_length=25,
-        choices=[(status.value, status.value) for status in OrderStatus],
-        default=OrderStatus.created.value
+        choices=[(status.name, status.value) for status in OrderStatus],
+        default=OrderStatus.created.name
     )
     studio = models.ForeignKey(
         'studio_client.Studio',

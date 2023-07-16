@@ -22,11 +22,17 @@ class SignUpSerializer(serializers.Serializer):
                 action_type='signup'
             )
         except ConfirmationCode.DoesNotExist:
-            raise serializers.ValidationError({'email': ['Неверно указана почта']})
+            raise serializers.ValidationError(
+                {'email': ['Неверно указана почта']}
+            )
         if confirmation_code.code != code:
-            raise serializers.ValidationError({'code': ['Неверный код']})
+            raise serializers.ValidationError(
+                {'code': ['Неверный код']}
+            )
         if not confirmation_code.valid_code():
-            raise serializers.ValidationError({'code': ['Срок действия кода истек']})
+            raise serializers.ValidationError(
+                {'code': ['Срок действия кода истек']}
+            )
 
         return data
 
@@ -61,14 +67,16 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
     def validate_status(self, value):
-        if (
-                value == OrderStatus.rejected.value
-                or value == OrderStatus.completed.value
-                or (
-                self.instance.status == OrderStatus.layout.value
-                and value == OrderStatus.agreement.value
-        )
-        ):
-            return value
-        else:
-            raise serializers.ValidationError("Недопустимое изменение статуса")
+        if self.instance is None:
+            raise serializers.ValidationError(['Недопустимое изменение статуса'])
+
+        current_status = self.instance.status
+        match value:
+            case OrderStatus.rejected.name:
+                return value
+            case OrderStatus.agreement.name if (
+                    current_status == OrderStatus.layout.name
+            ):
+                return value
+            case _:
+                raise serializers.ValidationError(['Недопустимое изменение статуса'])
