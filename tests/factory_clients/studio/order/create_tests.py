@@ -20,20 +20,23 @@ class CreateTests(APITestCase):
             'class_index': order.class_index,
             'customer_first_name': order.customer_first_name,
             'customer_last_name': order.customer_last_name,
-            'albums_count': order.albums_count
+            'albums_count': order.albums_count,
         }
         response = client.post('/studio/order/', data=order_params)
-        order_params.update({
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual({
             'id': 1,
             'customer_middle_name': None,
             'passcode': response.data['passcode'],
             'phone_number': None,
             'school': None,
             'status': OrderStatus.created.name,
-            'studio': studio.id
-        })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(order_params, response.data)
+            'studio': studio.id,
+            'class_index': order.class_index,
+            'customer_first_name': order.customer_first_name,
+            'customer_last_name': order.customer_last_name,
+            'albums_count': order.albums_count,
+        }, response.data)
         self.assertEqual(Order.objects.count(), 1)
         order = Order.objects.get()
         self.assertEqual(order.studio.id, studio.id)
@@ -55,19 +58,24 @@ class CreateTests(APITestCase):
             'customer_middle_name': order.customer_middle_name,
             'phone_number': order.phone_number,
             'albums_count': order.albums_count,
-            'passcode': order.passcode,
             'school': school.id,
         }
         client.force_authenticate(user=studio)
         response = client.post('/studio/order/', data=order_params)
-        order_params.update({
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual({
             'id': 1,
             'passcode': response.data['passcode'],
             'studio': studio.id,
-            'status': OrderStatus.created.name
-        })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(order_params, response.data)
+            'status': OrderStatus.created.name,
+            'class_index': order.class_index,
+            'customer_first_name': order.customer_first_name,
+            'customer_last_name': order.customer_last_name,
+            'customer_middle_name': order.customer_middle_name,
+            'phone_number': order.phone_number,
+            'albums_count': order.albums_count,
+            'school': school.id,
+        }, response.data)
         self.assertEqual(Order.objects.count(), 1)
         order = Order.objects.get()
         self.assertEqual(order.studio.id, studio.id)

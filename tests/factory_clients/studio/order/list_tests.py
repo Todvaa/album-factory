@@ -15,7 +15,6 @@ class ListTests(APITestCase):
         OrderFactory.create_batch(50, studio=studio)
         response = client.get('/studio/order/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 50)
         self.assertEqual(len(response.data['results']), 20)
 
