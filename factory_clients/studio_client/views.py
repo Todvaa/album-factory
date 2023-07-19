@@ -14,7 +14,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .mixins import CreateRetrieveListViewSet
 from .models import ConfirmationCode, Studio, School
-from .serializers import ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer
+from .serializers import (
+    ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
+    OrderPhotosCloudSerializer
+)
 from .utils import generate_random_code
 
 APP_ENV = os.getenv('APP_ENV')
@@ -87,9 +90,19 @@ class ConfirmationSendView(GenericAPIView):
         return Response(response_data)
 
 
+class OrderPhotosCloudView(GenericAPIView):
+    serializer_class = OrderPhotosCloudSerializer
+
+    def post(self, request, order_id):
+        serializer = OrderPhotosCloudSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print()
+        return Response({"detail": "success"})
+
+
 class SchoolViewSet(CreateRetrieveListViewSet):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
-    permission_classes = (IsAuthenticated, )
-    filter_backends = (SearchFilter, )
-    search_fields = ('full_name', )
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('full_name',)

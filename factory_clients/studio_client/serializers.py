@@ -1,6 +1,9 @@
+from urllib.parse import urlparse
+
 from django.core.validators import validate_email
 from rest_framework import serializers
 
+from .constants import VALID_DOMAINS
 from .models import ConfirmationCode, School
 
 
@@ -30,9 +33,29 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
+class OrderPhotosCloudSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
+    def validate(self, data):
+        url = urlparse(data.get('url'))
+        hostname = url.hostname
+        if not hostname:
+            raise serializers.ValidationError(
+                {'url': ['Необходимо указать url облака']}
+            )
+
+        domain = hostname.split('.')[-2]
+        if domain not in VALID_DOMAINS:
+            raise serializers.ValidationError(
+                {'url': [f'Необходимо валидный url облака {VALID_DOMAINS}']}
+            )
+
+        return data
+
+
 class ConfirmationSendSerializer(serializers.Serializer):
     email = serializers.EmailField(
-        max_length=255, required=True, validators=(validate_email, )
+        max_length=255, required=True, validators=(validate_email,)
     )
     action_type = serializers.ChoiceField(
         choices=('signup', 'reset'), required=True
