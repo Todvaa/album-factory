@@ -3,6 +3,8 @@ from enum import Enum
 from django.core.validators import RegexValidator
 from django.db import models
 
+from .utils import generate_random_passcode
+
 
 class OrderStatus(Enum):
     created = 'Создан'
@@ -26,8 +28,8 @@ class Order(models.Model):
             RegexValidator(
                 regex=r'^(?:[1-9]|1[0-1]) [А-Я]$',
                 message=(
-                    'Номер класса должен содержать '
-                    'цифру 1-11 и заглавную букву'
+                    'Номер класса должен содержать число '
+                    '1-11 и заглавную букву через пробел'
                 ),
             ),
         ]
@@ -49,7 +51,7 @@ class Order(models.Model):
     )
     phone_number = models.CharField(
         max_length=10,
-        unique=True,
+        null=True,
         validators=[
             RegexValidator(
                 regex=r'^9\d{9}$',
@@ -64,15 +66,14 @@ class Order(models.Model):
         blank=False,
         null=False,
     )
-    password = models.CharField(
-        max_length=150,
-        blank=False,
+    passcode = models.IntegerField(
         null=False,
+        default=generate_random_passcode
     )
     status = models.CharField(
         max_length=25,
         choices=[(status.name, status.value) for status in OrderStatus],
-        default=OrderStatus.created.value
+        default=OrderStatus.created.name
     )
     studio = models.ForeignKey(
         'studio_client.Studio',

@@ -25,14 +25,18 @@ class SchoolCreateTests(APITestCase):
         })
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'full_name': ['This field may not be blank.']})
+        self.assertEqual(
+            response.data, {'full_name': ['This field may not be blank.']}
+        )
 
     @pytest.mark.django_db
     def test_none_name(self):
         client.force_authenticate(user=StudioFactory())
         response = client.post('/studio/school/', {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'full_name': ['This field is required.']})
+        self.assertEqual(
+            response.data, {'full_name': ['This field is required.']}
+        )
 
     @pytest.mark.django_db
     def test_unauthenticated(self):
@@ -41,4 +45,7 @@ class SchoolCreateTests(APITestCase):
             'full_name': 'TEST'
         })
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data, {'detail': 'Authentication credentials were not provided.'})
+        self.assertEqual(
+            response.data,
+            {'detail': 'Authentication credentials were not provided.'}
+        )

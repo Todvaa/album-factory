@@ -1,10 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView
+)
 
 from .views import (
     StudioSignUpView, ConfirmationSendView, SchoolViewSet,
-    OrderPhotosCloudView
+    OrderViewSet, OrderPhotosCloudView
 )
 
 app_name = 'studio_client'
@@ -12,6 +14,7 @@ app_name = 'studio_client'
 router = DefaultRouter()
 
 router.register(r'school', SchoolViewSet, basename='school')
+router.register(r'order', OrderViewSet, basename='order')
 
 urlpatterns = [
     path(
