@@ -1,5 +1,5 @@
-import random
+from random import randint
 
 
 def generate_random_code():
-    return f'{random.randint(0, 999999):06d}'
+    return f'{randint(0, 999999):06d}'
