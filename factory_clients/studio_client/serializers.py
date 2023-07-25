@@ -1,7 +1,10 @@
+from urllib.parse import urlparse
+
 from django.core.validators import validate_email
 from rest_framework import serializers
 
 from customer_client.models import Order, OrderStatus
+from .constants import VALID_DOMAINS
 from .models import ConfirmationCode, School
 
 
@@ -32,6 +35,26 @@ class SignUpSerializer(serializers.Serializer):
         if not confirmation_code.valid_code():
             raise serializers.ValidationError(
                 {'code': ['Срок действия кода истек']}
+            )
+
+        return data
+
+
+class OrderPhotosCloudSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
+    def validate(self, data):
+        url = urlparse(data.get('url'))
+        hostname = url.hostname
+        if not hostname:
+            raise serializers.ValidationError(
+                {'url': ['Необходимо указать url облака']}
+            )
+
+        domain = hostname.split('.')[-2]
+        if domain not in VALID_DOMAINS:
+            raise serializers.ValidationError(
+                {'url': [f'Необходимо валидный url облака {VALID_DOMAINS}']}
             )
 
         return data

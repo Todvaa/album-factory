@@ -1,10 +1,13 @@
 import os
 
+from aiormq import AMQPConnectionError
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,13 +15,14 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from customer_client.models import Order
+from customer_client.models import Order, OrderStatus
+from .events import PhotosUploadingEvent
 from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
 from .models import ConfirmationCode, Studio, School
 from .permissions import IsOwner
 from .serializers import (
     ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
-    OrderSerializer
+    OrderSerializer, OrderPhotosCloudSerializer
 )
 from .utils import generate_random_code
 
@@ -90,6 +94,25 @@ class ConfirmationSendView(GenericAPIView):
         }
 
         return Response(response_data)
+
+
+class OrderPhotosCloudView(GenericAPIView):
+    serializer_class = OrderPhotosCloudSerializer
+
+    def post(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id, studio=request.user)
+        serializer = OrderPhotosCloudSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            PhotosUploadingEvent(url=serializer.validated_data['url'], order_id=order_id).handle()
+            order.status = OrderStatus.portraits_uploading.name
+            order.save()
+
+        except AMQPConnectionError:
+            return Response({'detail': 'Retry later'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        return Response({'detail': 'success'})
 
 
 class SchoolViewSet(CreateRetrieveListViewSet):
