@@ -12,8 +12,9 @@ load_dotenv()
 class AbstractEvent:
     RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
     RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
+    RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
     # todo: move port to env
-    broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:5672/')
+    broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:{RABBITMQ_PORT}/')
 
     # todo: decorator
     def handle(self):
@@ -24,8 +25,8 @@ class AbstractEvent:
 
 
 class PhotosUploadingEvent(AbstractEvent):
-    exchange = RabbitExchange('upload_photo_exchange', type=ExchangeType.DIRECT)
-    upload_photo_queue = RabbitQueue('upload_photo')
+    exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
+    photo_downloading_queue = RabbitQueue('photo_downloading')
 
     def __init__(self, url, order_id):
         self.url = url
@@ -37,7 +38,7 @@ class PhotosUploadingEvent(AbstractEvent):
                 message=self._serialize(
                     url=self.url, order_id=self.order_id
                 ),
-                exchange=self.exchange, routing_key='upload_photo'
+                exchange=self.exchange, routing_key='photo_downloading'
             )
 
     def handle(self):

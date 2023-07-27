@@ -1,12 +1,20 @@
+import os
+import tempfile
 from urllib.parse import urlparse, parse_qsl, urlencode
 
 import requests
 
-from constants import BASE_DIR, SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR
+from constants import (
+    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, SM_PH_SZ, LG_PH_SZ
+)
 
 
 class AbstractDownloader:
-    SOURCE = None
+
+    def __init__(self, source, order_id):
+        self.source = source
+        self.order_id = order_id
+        self.downloads_dir = os.path.join(tempfile.mkdtemp(''), order_id)
 
     # метод должен возращать пути до локальной директории, куда он все скачал
     def run(self):
@@ -17,17 +25,14 @@ class YandexDownloader(AbstractDownloader):
     # тестовое облако https://disk.yandex.ru/d/RTqLhx3YnUxUrQ
     SOURCE = f'https://cloud-api.yandex.net/v1/disk/public/resources'
 
-    def __init__(self, disk_url):
-        self.source = f'{self.SOURCE}?public_key={disk_url}'
-
-    def get_photos_data(self):
-        response = requests.get(url=self.source)
+    def __get_photos_data(self):
+        response = requests.get(url=f'{self.API_METHOD}?public_key={self.source}')
         if response.status_code != 200:
             raise ValueError('Yandex API request was not successful.')
 
         return response.json()['_embedded']['items']
 
-    def change_size(self, photo_url, new_size):
+    def __change_size(self, photo_url, new_size):
         parsed_url = urlparse(photo_url)
         query_params = dict(parse_qsl(parsed_url.query))
         query_params['size'] = new_size
@@ -35,7 +40,7 @@ class YandexDownloader(AbstractDownloader):
         return parsed_url._replace(query=urlencode(query_params)).geturl()
 
     # todo: mock тест
-    def download_content(self, url):
+    def __download_content(self, url):
         response = requests.get(url)
         if response.status_code == 200:
             return response.content
@@ -43,23 +48,23 @@ class YandexDownloader(AbstractDownloader):
             raise ValueError('Failed to download content.')
 
     def run(self):
-        photos_data = self.get_photos_data()
-        downloads_dir = BASE_DIR / 'downloads'
-        downloads_dir.mkdir(exist_ok=True)
-        small_dir = downloads_dir / SM_PH_DIR
-        small_dir.mkdir(exist_ok=True)
-        large_dir = downloads_dir / LG_PH_DIR
-        large_dir.mkdir(exist_ok=True)
-        original_dir = downloads_dir / ORIG_PH_DIR
+        photos_data = self.__get_photos_data()
+        # todo: check if exist dont reupload
+        os.mkdir(self.downloads_dir)
+        small_dir = self.downloads_dir / SM_PH_DIR
+        small_dir.mkdir(parents=True, exist_ok=True)
+        large_dir = self.downloads_dir / LG_PH_DIR
+        large_dir.mkdir(parents=True, exist_ok=True)
+        original_dir = self.downloads_dir / ORIG_PH_DIR
         original_dir.mkdir(exist_ok=True)
         for photo_data in photos_data:
-            small_photo = self.download_content(
-                self.change_size(photo_url=photo_data['preview'], new_size='L')
+            small_photo = self.__download_content(
+                self.__change_size(photo_url=photo_data['preview'], new_size=SM_PH_SZ)
             )
-            large_photo = self.download_content(
-                self.change_size(photo_url=photo_data['preview'], new_size='XL')
+            large_photo = self.__download_content(
+                self.__change_size(photo_url=photo_data['preview'], new_size=LG_PH_SZ)
             )
-            original_photo = self.download_content(photo_data['file'])
+            original_photo = self.__download_content(photo_data['file'])
             with open(small_dir / photo_data['name'], 'wb') as file:
                 file.write(small_photo)
             with open(large_dir / photo_data['name'], 'wb') as file:
@@ -67,4 +72,4 @@ class YandexDownloader(AbstractDownloader):
             with open(original_dir / photo_data['name'], 'wb') as file:
                 file.write(original_photo)
 
-        return downloads_dir
+        return self.downloads_dir
