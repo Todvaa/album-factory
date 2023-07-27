@@ -20,10 +20,13 @@ class AbstractDownloader:
     def run(self):
         pass
 
+    def clean(self):
+        os.rmdir(self.downloads_dir)
+
 
 class YandexDownloader(AbstractDownloader):
     # тестовое облако https://disk.yandex.ru/d/RTqLhx3YnUxUrQ
-    SOURCE = f'https://cloud-api.yandex.net/v1/disk/public/resources'
+    API_METHOD = f'https://cloud-api.yandex.net/v1/disk/public/resources'
 
     def __get_photos_data(self):
         response = requests.get(url=f'{self.API_METHOD}?public_key={self.source}')
