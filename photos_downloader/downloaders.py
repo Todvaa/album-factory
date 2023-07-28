@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode
 import requests
 
 from constants import (
-    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, SM_PH_SZ, LG_PH_SZ
+    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, SM_PH_SZ, LG_PH_SZ, PREVIEW_DIR
 )
 
 
@@ -54,12 +54,14 @@ class YandexDownloader(AbstractDownloader):
         photos_data = self.__get_photos_data()
         # todo: check if exist dont reupload
         os.mkdir(self.downloads_dir)
-        small_dir = self.downloads_dir / SM_PH_DIR
-        small_dir.mkdir(parents=True, exist_ok=True)
-        large_dir = self.downloads_dir / LG_PH_DIR
-        large_dir.mkdir(parents=True, exist_ok=True)
-        original_dir = self.downloads_dir / ORIG_PH_DIR
-        original_dir.mkdir(exist_ok=True)
+        preview_dir = os.path.join(self.downloads_dir, PREVIEW_DIR)
+        os.mkdir(preview_dir)
+        small_dir = os.path.join(preview_dir, SM_PH_DIR)
+        os.mkdir(small_dir)
+        large_dir = os.path.join(preview_dir, LG_PH_DIR)
+        os.mkdir(large_dir)
+        original_dir = os.path.join(self.downloads_dir, ORIG_PH_DIR)
+        os.mkdir(original_dir)
         for photo_data in photos_data:
             small_photo = self.__download_content(
                 self.__change_size(photo_url=photo_data['preview'], new_size=SM_PH_SZ)
@@ -68,11 +70,11 @@ class YandexDownloader(AbstractDownloader):
                 self.__change_size(photo_url=photo_data['preview'], new_size=LG_PH_SZ)
             )
             original_photo = self.__download_content(photo_data['file'])
-            with open(small_dir / photo_data['name'], 'wb') as file:
+            with open(os.path.join(small_dir, photo_data['name']), 'wb') as file:
                 file.write(small_photo)
-            with open(large_dir / photo_data['name'], 'wb') as file:
+            with open(os.path.join(large_dir, photo_data['name']), 'wb') as file:
                 file.write(large_photo)
-            with open(original_dir / photo_data['name'], 'wb') as file:
+            with open(os.path.join(original_dir, photo_data['name']), 'wb') as file:
                 file.write(original_photo)
 
         return self.downloads_dir

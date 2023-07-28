@@ -26,16 +26,19 @@ photo_processing_queue = RabbitQueue('photo_processing')
 async def photo_downloading_handler(message):
     # For more complex usecases just use the tenacity library.
     # возвращает тип данных WindowsPath
-    order_id = message['order_id']
+    message = json.loads(message)
+    order_id = str(message['order_id'])
     downloader = YandexDownloader(
         source=message['url'],
         order_id=order_id
     )
+    # 'C:\\Users\\mi\\AppData\\Local\\Temp\\tmp7b40nxdo\\2\\
     local_path = downloader.run()
     s3_path = MinioUploader(
         local_path=local_path,
         order_id=order_id
     ).run()
+    # todo: проверить почему директория не удалилась
     downloader.clean()
 
     async with broker:
