@@ -8,8 +8,9 @@ def run():
     recognizer = Recognizer('test_photos')
     persons_vectors = recognizer.run()
     classificator = Classificator(persons_vectors)
-    classificator.run()
-
+    persons = classificator.run()
+    # todo: сделать слушателя = консьюмер photos_procesfasfaing
+    # todo: положить в photos_prsdgsdgsed [persons_vectors, persons]
 
 if __name__ == "__main__":
     run()
