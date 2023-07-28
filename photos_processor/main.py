@@ -1,8 +1,14 @@
+from photos_processor.classificators import Classificator
+from photos_processor.recognizers import Recognizer
+
+
 def run():
-    local_path = dowload_photos()
-    recognizer = new
-    Recognizer(local_path)
+    # local_path = download_photos()
+    # recognizer = Recognizer(local_path)
+    recognizer = Recognizer('test_photos')
     persons_vectors = recognizer.run()
+    classificator = Classificator(persons_vectors)
+    classificator.run()
 
 
 if __name__ == "__main__":

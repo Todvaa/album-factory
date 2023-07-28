@@ -1,5 +1,8 @@
 import os
 
+import cv2
+import face_recognition
+
 
 class AbstractRecognizer:
     def __init__(self, dir_path):
@@ -15,14 +18,19 @@ class AbstractRecognizer:
         files = self.get_photos_list()
         vectors = {}
         for file in files:
-            vector = self.handle(file)
+            vector = self.handle(os.path.join(self.dir_path, file))
             vectors[file] = vector
 
         return vectors
 
-
 class Recognizer(AbstractRecognizer):
     def handle(self, file_path):
-        face_detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
-        img = cv2.imread('conor.jpg')
+        img = cv2.imread(file_path)
+        vector_faces = face_recognition.face_encodings(img)
+        # todo: скипать фотку если нет лица
+        if len(vector_faces) == 1:
+            vector = face_recognition.face_encodings(img)[0]
+        else:
+            vector = None
+
+        return vector
