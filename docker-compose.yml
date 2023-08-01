@@ -17,7 +17,7 @@ services:
     volumes:
       - cache:/var/lib/redis/data
   queue:
-    image: rabbitmq:3.9.29
+    image: rabbitmq:3.10.7-management
     restart: always
     ports:
       - '5672:5672'
