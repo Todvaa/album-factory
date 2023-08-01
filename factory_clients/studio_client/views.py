@@ -98,6 +98,7 @@ class ConfirmationSendView(GenericAPIView):
 
 class OrderPhotosCloudView(GenericAPIView):
     serializer_class = OrderPhotosCloudSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, order_id):
         order = get_object_or_404(Order, id=order_id, studio=request.user)
