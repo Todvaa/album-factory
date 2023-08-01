@@ -1,0 +1,5 @@
+propan[async-rabbit]==0.1.5.11
+requests==2.31.0
+python-dotenv==0.21.1
+s3fs==2023.6.0
+python-slugify==8.0.1
