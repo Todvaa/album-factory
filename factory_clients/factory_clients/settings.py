@@ -131,7 +131,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    # todo: move td to env
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 

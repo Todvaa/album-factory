@@ -13,3 +13,4 @@ faker==18.13.0
 factory-boy==3.2.1
 pytest-django==4.5.2
 parameterized==0.9.0
+propan[async-rabbit]==0.1.5.11
