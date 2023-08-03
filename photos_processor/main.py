@@ -20,6 +20,7 @@ photo_processing_queue = RabbitQueue('photos_processing')
 photos_processed_queue = RabbitQueue('photos_processed')
 
 
+@broker.handle(photo_processing_queue, exchange, retry=True)
 def run():
     # local_path = download_photos()
     # recognizer = Recognizer(local_path)
@@ -29,6 +30,7 @@ def run():
     persons = classificator.run()
     # todo: сделать слушателя = консьюмер photo_processing
     # todo: положить в photos_processed [persons_vectors, persons]
+
 
 if __name__ == "__main__":
     run()

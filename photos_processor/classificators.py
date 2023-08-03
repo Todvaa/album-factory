@@ -1,13 +1,15 @@
 import json
+from abc import ABC, abstractmethod
 
 from scipy.spatial.distance import pdist
 
 
-class AbstractClassificator:
+class AbstractClassificator(ABC):
 
     def __init__(self, vectors):
         self.vectors = vectors
 
+    @abstractmethod
     def run(self):
         pass
 
@@ -41,5 +43,5 @@ class Classificator(AbstractClassificator):
                 if not was_added:
                     persons.append(photos)
         # todo: добавлять тех, кто не похож ни на кого
-        # todo: дабавляются дубликаты
+        # todo: добавляются дубликаты
         return persons

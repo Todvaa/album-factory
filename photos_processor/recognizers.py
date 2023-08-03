@@ -1,13 +1,15 @@
 import os
+from abc import ABC, abstractmethod
 
 import cv2
 import face_recognition
 
 
-class AbstractRecognizer:
+class AbstractRecognizer(ABC):
     def __init__(self, dir_path):
         self.dir_path = dir_path
 
+    @abstractmethod
     def handle(self, file_path):
         pass
 
@@ -22,6 +24,7 @@ class AbstractRecognizer:
             vectors[file] = vector
 
         return vectors
+
 
 class Recognizer(AbstractRecognizer):
     def handle(self, file_path):
