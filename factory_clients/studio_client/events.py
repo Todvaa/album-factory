@@ -25,12 +25,12 @@ class AbstractEvent(ABC):
 
 
 class PhotosUploadingEvent(AbstractEvent):
-    exchange = RabbitExchange('upload_photo_exchange', type=ExchangeType.DIRECT)
-    upload_photo_queue = RabbitQueue('upload_photo')
+    exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
+    photos_downloading_queue = RabbitQueue('photos_downloading')
 
-    def __init__(self, url: str, order_id):
+    def __init__(self, url: str, order_id: int):
         self.url = url
-        self.order_id = str(order_id)
+        self.order_id = order_id
 
     async def queue(self):
         async with self.broker as broker:
@@ -38,7 +38,7 @@ class PhotosUploadingEvent(AbstractEvent):
                 message=self._serialize(
                     url=self.url, order_id=self.order_id
                 ),
-                exchange=self.exchange, routing_key='upload_photo'
+                exchange=self.exchange, routing_key='photos_downloading'
             )
 
     def handle(self):
