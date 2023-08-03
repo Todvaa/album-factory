@@ -20,13 +20,13 @@ broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@l
 app = PropanApp(broker)
 exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
 
-photo_downloading_queue = RabbitQueue('photo_downloading')
+photos_downloading_queue = RabbitQueue('photos_downloading')
 photos_downloaded_queue = RabbitQueue('photos_downloaded')
-photo_processing_queue = RabbitQueue('photo_processing')
+photos_processing_queue = RabbitQueue('photos_processing')
 
 
-@broker.handle(photo_downloading_queue, exchange, retry=True)
-async def photo_downloading_handler(message):
+@broker.handle(photos_downloading_queue, exchange, retry=True)
+async def photos_downloading_handler(message):
     # todo: For more complex use-cases just use the tenacity library.
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
@@ -60,11 +60,11 @@ async def publish_photos(order_id, s3_path):
         )
         logger.info(
             module=MODULE_NAME,
-            message=f'pushing message to {photo_processing_queue.name}'
+            message=f'pushing message to {photos_processing_queue.name}'
         )
         await br.publish(
             message=json.dumps({'order_id': order_id, 's3_path': s3_path}),
-            exchange=exchange, routing_key='photo_processing'
+            exchange=exchange, routing_key='photos_processing'
         )
     logger.info(
         module=MODULE_NAME, message=f'pushed'
