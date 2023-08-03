@@ -17,6 +17,9 @@ class AbstractClassificator(ABC):
 
 class Classificator(AbstractClassificator):
 
+    def __average_vector(self, vectors: list):
+        return sum(vectors) / len(vectors)
+
     def run(self):
         unclassified_vectors = self.vectors.copy()
         persons = []
@@ -35,4 +38,8 @@ class Classificator(AbstractClassificator):
 
             persons.append(person)
 
-        return
+        for person in persons:
+            person['vector'] = self.__average_vector(vectors=person['vectors']).tolist()
+            person.pop('vectors')
+
+        return persons

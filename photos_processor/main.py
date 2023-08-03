@@ -39,5 +39,13 @@ async def photos_processing_handler(message):
     # todo: положить в photos_processed
 
 
+async def publish_persons(order_id, s3_path):
+    async with RabbitBroker(
+            f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
+            f'@localhost:{RABBITMQ_PORT}/'
+    ) as br:
+        pass
+
+
 if __name__ == "__main__":
     asyncio.run(app.run())

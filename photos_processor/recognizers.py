@@ -27,6 +27,7 @@ class AbstractRecognizer(ABC):
         return vectors
 
 
+# todo: crop photos
 class Recognizer(AbstractRecognizer):
     def _handle(self, file_path: str):
         img = cv2.imread(file_path)
