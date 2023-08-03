@@ -101,4 +101,5 @@ class YandexDownloader(AbstractDownloader):
             module=MODULE_NAME,
             message=f'{len(photos_data) * 3} photos downloaded'
         )
+
         return self.downloads_dir

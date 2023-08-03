@@ -35,7 +35,7 @@ class MinioUploader(AbstractUploader):
 
         s3_path = f'{BUCKET_PHOTO}/'
         self.FILE_SYSTEM.upload(
-            str(self.local_path),
+            self.local_path,
             s3_path, recursive=True
         )
         logger.info(module=MODULE_NAME, message='uploaded')
