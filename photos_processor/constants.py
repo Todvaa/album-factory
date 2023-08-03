@@ -1,1 +1,2 @@
-BUCKET_PHOTO = 'photos-storage'
+ORIG_PH_DIR = 'original'
+EQUALITY_FACTOR = 0.6

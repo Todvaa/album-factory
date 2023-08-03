@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from s3fs import S3FileSystem
 
-from constants import BUCKET_PHOTO
+from constants import ORIG_PH_DIR
 
 load_dotenv()
 
@@ -17,8 +17,9 @@ MINIO_PORT = os.getenv('MINIO_PORT')
 
 class AbstractDownloader(ABC):
 
-    def __init__(self, order_id: int):
+    def __init__(self, order_id: int, s3_path: str):
         self.order_id = str(order_id)
+        self.s3_path = s3_path + f'{self.order_id}/{ORIG_PH_DIR}/'
         self.downloads_dir = os.path.join(tempfile.mkdtemp(''), self.order_id)
 
     @abstractmethod
@@ -35,10 +36,10 @@ class MinioDownloader(AbstractDownloader):
         endpoint_url=f'http://localhost:{MINIO_PORT}'
     )
 
-    def run(self):
+    def run(self) -> str:
         self.FILE_SYSTEM.get(
-            f'{BUCKET_PHOTO}/{self.order_id}/',
+            self.s3_path,
             self.downloads_dir, recursive=True
         )
 
-        return
+        return self.downloads_dir
