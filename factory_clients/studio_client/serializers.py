@@ -46,11 +46,6 @@ class OrderPhotosCloudSerializer(serializers.Serializer):
     def validate(self, data):
         url = urlparse(data.get('url'))
         hostname = url.hostname
-        if not hostname:
-            raise serializers.ValidationError(
-                {'url': ['Необходимо указать url облака']}
-            )
-
         domain = hostname.split('.')[-2]
         if domain not in VALID_DOMAINS:
             raise serializers.ValidationError(

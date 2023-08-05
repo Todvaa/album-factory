@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from abc import ABC, abstractmethod
 
 from dotenv import load_dotenv
 from propan import RabbitBroker
@@ -9,26 +10,25 @@ from propan.brokers.rabbit import RabbitExchange, ExchangeType, RabbitQueue
 load_dotenv()
 
 
-class AbstractEvent:
+class AbstractEvent(ABC):
     RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
     RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
     RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-    # todo: move port to env
     broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:{RABBITMQ_PORT}/')
 
-    # todo: decorator
+    @abstractmethod
     def handle(self):
         pass
 
-    def _serialize(self, **kwargs):
+    def _serialize(self, **kwargs) -> str:
         return json.dumps(kwargs)
 
 
 class PhotosUploadingEvent(AbstractEvent):
     exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
-    photo_downloading_queue = RabbitQueue('photo_downloading')
+    photos_downloading_queue = RabbitQueue('photos_downloading')
 
-    def __init__(self, url, order_id):
+    def __init__(self, url: str, order_id: int):
         self.url = url
         self.order_id = order_id
 
@@ -38,7 +38,7 @@ class PhotosUploadingEvent(AbstractEvent):
                 message=self._serialize(
                     url=self.url, order_id=self.order_id
                 ),
-                exchange=self.exchange, routing_key='photo_downloading'
+                exchange=self.exchange, routing_key='photos_downloading'
             )
 
     def handle(self):
