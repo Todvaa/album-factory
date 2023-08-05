@@ -7,7 +7,9 @@ from propan import RabbitBroker, PropanApp
 from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
 
 from classificators import Classificator
-from downloaders import MinioDownloader
+from downloaders import S3Downloader
+from dto import Photo
+from photos_processor.constants import ORIG_PH_DIR
 from recognizers import Recognizer
 
 load_dotenv()
@@ -28,23 +30,41 @@ photos_processed_queue = RabbitQueue('photos_processed')
 async def photos_processing_handler(message):
     message = json.loads(message)
     order_id = message['order_id']
-    s3_path = message['s3_path']
-    local_path = MinioDownloader(order_id=order_id, s3_path=s3_path).run()
-    recognizer = Recognizer(dir_path=local_path)
+    s3_path = message['s3_path'] + f'{order_id}/{ORIG_PH_DIR}/'
+    downloader = S3Downloader(order_id=order_id, s3_path=s3_path)
+    local_path = downloader.run()
+    photos = [
+        Photo(name=name).set_remote_url(
+            remote_url=s3_path + name
+        ) for name in os.listdir(local_path)
+    ]
+    recognizer = Recognizer(dir_path=local_path, photos=photos)
     persons_vectors = recognizer.run()
-
+    downloader.clean()
     classificator = Classificator(vectors=persons_vectors)
     persons = classificator.run()
-    # todo: сделать слушателя = консьюмер photo_processing
-    # todo: положить в photos_processed
+    data = {
+        'order_id': order_id,
+        'images': [
+            {
+                's3_url': photo.remote_url, 'face_count': photo.face_count
+            } for photo in photos
+        ],
+        'persons': persons
+    }
+
+    await publish_vectors(data)
 
 
-async def publish_persons(order_id, s3_path):
+async def publish_vectors(data):
     async with RabbitBroker(
             f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
             f'@localhost:{RABBITMQ_PORT}/'
     ) as br:
-        pass
+        await br.publish(
+            message=json.dumps(data),
+            exchange=exchange, routing_key='photos_processed'
+        )
 
 
 if __name__ == "__main__":

@@ -6,23 +6,22 @@ import face_recognition
 
 
 class AbstractRecognizer(ABC):
-    def __init__(self, dir_path: str):
+    def __init__(self, dir_path: str, photos: list):
         self.dir_path = dir_path
+        self.photos = photos
 
     @abstractmethod
     def _handle(self, file_path: str):
         pass
 
-    def __get_photos_list(self):
-        return os.listdir(self.dir_path)
-
     def run(self) -> dict:
-        files = self.__get_photos_list()
         vectors = {}
-        for file in files:
-            vector = self._handle(os.path.join(self.dir_path, file))
+        for photo in self.photos:
+            vector = self._handle(os.path.join(self.dir_path, photo.name))
             if vector is not None:
-                vectors[file] = vector
+                photo.append_vector(vector=vector)
+                vectors[photo.name] = vector
+
             # todo: если none, то запись в лог, что у фото не распознано лицо
         return vectors
 
