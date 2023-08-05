@@ -4,6 +4,9 @@ from abc import ABC, abstractmethod
 import cv2
 import face_recognition
 
+from constants import MODULE_NAME
+from shared.logger import logger
+
 
 class AbstractRecognizer(ABC):
     def __init__(self, dir_path: str, photos: list):
@@ -15,14 +18,20 @@ class AbstractRecognizer(ABC):
         pass
 
     def run(self) -> dict:
+        logger.info(module=MODULE_NAME, message='Face recognition launched')
         vectors = {}
         for photo in self.photos:
             vector = self._handle(os.path.join(self.dir_path, photo.name))
             if vector is not None:
                 photo.append_vector(vector=vector)
                 vectors[photo.name] = vector
+            else:
+                logger.info(
+                    module=MODULE_NAME,
+                    message=f'Face not recognized in photo {photo.name}'
+                )
+        logger.info(module=MODULE_NAME, message='Face recognition finished')
 
-            # todo: если none, то запись в лог, что у фото не распознано лицо
         return vectors
 
 

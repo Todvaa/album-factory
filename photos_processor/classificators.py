@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 from scipy.spatial.distance import pdist
 
-from constants import EQUALITY_FACTOR
+from constants import EQUALITY_FACTOR, MODULE_NAME
+from shared.logger import logger
 
 
 class AbstractClassificator(ABC):
@@ -21,6 +22,7 @@ class Classificator(AbstractClassificator):
         return sum(vectors) / len(vectors)
 
     def run(self):
+        logger.info(module=MODULE_NAME, message='People classifier launched')
         unclassified_vectors = self.vectors.copy()
         persons = []
         while len(unclassified_vectors) != 0:
@@ -41,5 +43,7 @@ class Classificator(AbstractClassificator):
         for person in persons:
             person['vector'] = self.__average_vector(vectors=person['vectors']).tolist()
             person.pop('vectors')
+
+        logger.info(module=MODULE_NAME, message=f'{len(persons)} people recognized')
 
         return persons
