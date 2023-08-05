@@ -9,9 +9,9 @@ from shared.logger import logger
 
 load_dotenv()
 
-MINIO_ROOT_USER = os.getenv('MINIO_ROOT_USER')
-MINIO_ROOT_PASSWORD = os.getenv('MINIO_ROOT_PASSWORD')
-MINIO_PORT = os.getenv('MINIO_PORT')
+S3_ROOT_USER = os.getenv('S3_ROOT_USER')
+S3_ROOT_PASSWORD = os.getenv('S3_ROOT_PASSWORD')
+S3_URL = os.getenv('S3_URL')
 
 
 class AbstractUploader(ABC):
@@ -21,10 +21,10 @@ class AbstractUploader(ABC):
         pass
 
 
-class MinioUploader(AbstractUploader):
+class S3Uploader(AbstractUploader):
     FILE_SYSTEM = S3FileSystem(
-        key=MINIO_ROOT_USER, secret=MINIO_ROOT_PASSWORD,
-        endpoint_url=f'http://localhost:{MINIO_PORT}'
+        key=S3_ROOT_USER, secret=S3_ROOT_PASSWORD,
+        endpoint_url=S3_URL
     )
 
     def __init__(self, local_path: str):

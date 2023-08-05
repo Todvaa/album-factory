@@ -69,7 +69,6 @@ class YandexDownloader(AbstractDownloader):
 
     def run(self) -> str:
         logger.info(module=MODULE_NAME, message='start downloading from Yandex')
-        photos_data = self.__get_photos_data()
         os.mkdir(self.downloads_dir)
         preview_dir = os.path.join(self.downloads_dir, PREVIEW_DIR)
         os.mkdir(preview_dir)
@@ -79,6 +78,7 @@ class YandexDownloader(AbstractDownloader):
         os.mkdir(large_dir)
         original_dir = os.path.join(self.downloads_dir, ORIG_PH_DIR)
         os.mkdir(original_dir)
+        photos_data = self.__get_photos_data()
         for photo_data in photos_data:
             logger.info(
                 module=MODULE_NAME, message=f'downloading photo {photo_data["preview"]}'

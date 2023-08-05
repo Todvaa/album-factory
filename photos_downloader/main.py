@@ -8,7 +8,7 @@ from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
 
 from downloaders import YandexDownloader
 from photos_downloader.constants import MODULE_NAME
-from photos_downloader.uploaders import MinioUploader
+from photos_downloader.uploaders import S3Uploader
 from shared.logger import logger
 
 load_dotenv()
@@ -16,8 +16,11 @@ load_dotenv()
 RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
 RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:{RABBITMQ_PORT}/')
-app = PropanApp(broker)
+rabbitmq_broker = RabbitBroker(
+    f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
+    f'@localhost:{RABBITMQ_PORT}/'
+)
+app = PropanApp(rabbitmq_broker)
 exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
 
 photos_downloading_queue = RabbitQueue('photos_downloading')
@@ -25,9 +28,9 @@ photos_downloaded_queue = RabbitQueue('photos_downloaded')
 photos_processing_queue = RabbitQueue('photos_processing')
 
 
-@broker.handle(photos_downloading_queue, exchange, retry=True)
+# todo: For more complex use-cases just use the tenacity library for retry.
+@rabbitmq_broker.handle(photos_downloading_queue, exchange, retry=True)
 async def photos_downloading_handler(message):
-    # todo: For more complex use-cases just use the tenacity library.
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
     order_id = message['order_id']
@@ -36,7 +39,7 @@ async def photos_downloading_handler(message):
         order_id=order_id
     )
     local_path = downloader.run()
-    s3_path = MinioUploader(
+    s3_path = S3Uploader(
         local_path=local_path,
     ).run()
     logger.info(module=MODULE_NAME, message=f's3 path: {s3_path}')
@@ -49,12 +52,12 @@ async def publish_photos(order_id, s3_path):
     async with RabbitBroker(
             f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
             f'@localhost:{RABBITMQ_PORT}/'
-    ) as br:
+    ) as broker:
         logger.info(
             module=MODULE_NAME,
             message=f'pushing message to {photos_downloaded_queue.name}'
         )
-        await br.publish(
+        await broker.publish(
             message=json.dumps({'order_id': order_id, 's3_path': s3_path}),
             exchange=exchange, routing_key='photos_downloaded'
         )
@@ -62,7 +65,7 @@ async def publish_photos(order_id, s3_path):
             module=MODULE_NAME,
             message=f'pushing message to {photos_processing_queue.name}'
         )
-        await br.publish(
+        await broker.publish(
             message=json.dumps({'order_id': order_id, 's3_path': s3_path}),
             exchange=exchange, routing_key='photos_processing'
         )
