@@ -9,7 +9,4 @@ SM_PH_DIR = 'small'
 LG_PH_DIR = 'large'
 ORIG_PH_DIR = 'original'
 
-SM_PH_SZ = 'L'
-LG_PH_SZ = 'XL'
-
 BUCKET_PHOTO = 'photos-storage'
