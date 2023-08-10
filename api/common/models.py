@@ -207,12 +207,12 @@ class Order(models.Model):
         default=OrderStatus.created.name
     )
     studio = models.ForeignKey(
-        'studio.Studio',
+        'common.Studio',
         on_delete=models.CASCADE,
         related_name='order'
     )
     school = models.ForeignKey(
-        'studio.School',
+        'common.School',
         on_delete=models.CASCADE,
         related_name='order',
         blank=True,
@@ -255,7 +255,7 @@ class PersonStaff(models.Model):
         null=False,
     )
     school = models.ForeignKey(
-        'studio.School',
+        'common.School',
         on_delete=models.CASCADE,
         related_name='person_staff'
     )

@@ -21,7 +21,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'studio.Studio'
+AUTH_USER_MODEL = 'common.Studio'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -30,6 +30,7 @@ AUTHENTICATION_BACKENDS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'common',
     'studio',
     'customer',
     'django.contrib.admin',
