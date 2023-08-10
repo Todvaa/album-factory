@@ -14,7 +14,10 @@ class AbstractEvent(ABC):
     RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
     RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
     RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-    broker = RabbitBroker(f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:{RABBITMQ_PORT}/')
+    rabbitmq_broker = RabbitBroker(
+        f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
+        f'@localhost:{RABBITMQ_PORT}/'
+    )
 
     @abstractmethod
     def handle(self):
@@ -33,7 +36,7 @@ class PhotosUploadingEvent(AbstractEvent):
         self.order_id = order_id
 
     async def queue(self):
-        async with self.broker as broker:
+        async with self.rabbitmq_broker as broker:
             await broker.publish(
                 message=self._serialize(
                     url=self.url, order_id=self.order_id
