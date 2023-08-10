@@ -15,10 +15,9 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from customer_client.models import Order, OrderStatus
+from common.models import ConfirmationCode, Studio, School, OrderStatus, Order
 from .events import PhotosUploadingEvent
 from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
-from .models import ConfirmationCode, Studio, School
 from .permissions import IsOwner
 from .serializers import (
     ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,

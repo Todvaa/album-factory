@@ -5,14 +5,14 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import customer_client.utils
+import customer.utils
 
 
 class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('studio_client', '0001_initial'),
+        ('studio', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('school_subject', models.CharField(max_length=150)),
                 ('photo', models.ImageField(upload_to='person_staff_photo/')),
                 ('school', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='person_staff',
-                                             to='studio_client.school')),
+                                             to='studio.school')),
             ],
             options={
                 'ordering': ['id'],
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                     django.core.validators.RegexValidator(
                         message='Номер телефона должен состоять из 10 цифр и начинаться с 9', regex='^9\\d{9}$')])),
                 ('albums_count', models.IntegerField()),
-                ('passcode', models.IntegerField(default=customer_client.utils.generate_random_passcode)),
+                ('passcode', models.IntegerField(default=customer.utils.generate_random_passcode)),
                 ('status', models.CharField(
                     choices=[('created', 'Создан'), ('portraits_uploading', 'Загрузка портретов'),
                              ('portraits_uploaded', 'Портреты загружены'),
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                              ('agreement', 'Согласование'), ('printing', 'Печать'), ('completed', 'Завершен'),
                              ('rejected', 'Отменен')], default='created', max_length=25)),
                 ('school', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
-                                             related_name='order', to='studio_client.school')),
+                                             related_name='order', to='studio.school')),
                 ('studio', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order',
                                              to=settings.AUTH_USER_MODEL)),
             ],

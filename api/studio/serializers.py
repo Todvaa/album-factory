@@ -3,9 +3,8 @@ from urllib.parse import urlparse
 from django.core.validators import validate_email
 from rest_framework import serializers
 
-from customer_client.models import Order, OrderStatus
+from common.models import ConfirmationCode, School, OrderStatus, Order
 from .constants import VALID_DOMAINS
-from .models import ConfirmationCode, School
 
 
 class SignUpSerializer(serializers.Serializer):

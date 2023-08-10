@@ -1,8 +1,7 @@
 from django.contrib.auth.backends import BaseBackend
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from customer_client.models import Order
-from studio_client.models import Studio
+from common.models import Studio, Order
 
 
 class StudioBackend(BaseBackend):

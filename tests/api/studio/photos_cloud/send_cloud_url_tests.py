@@ -4,7 +4,7 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from studio_client.constants import VALID_DOMAINS
+from studio.constants import VALID_DOMAINS
 from tests.api.factories import OrderFactory, StudioFactory
 from tests.utils import client
 

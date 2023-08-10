@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from studio_client.models import ConfirmationCode
+from common.models import ConfirmationCode
 from tests.utils import client, fake
 
 

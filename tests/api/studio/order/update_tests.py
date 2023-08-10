@@ -3,7 +3,7 @@ from parameterized import parameterized
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from customer_client.models import Order, OrderStatus
+from common.models import OrderStatus, Order
 from tests.api.factories import (
     StudioFactory, OrderFactory, SchoolFactory
 )

@@ -4,8 +4,7 @@ import factory
 from django.db import models
 from django.utils import timezone
 
-from customer_client.models import Order, OrderStatus
-from studio_client.models import Studio, ConfirmationCode, School
+from common.models import Studio, ConfirmationCode, School, OrderStatus, Order
 from tests.utils import fake
 
 

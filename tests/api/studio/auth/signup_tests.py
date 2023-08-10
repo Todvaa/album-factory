@@ -7,7 +7,7 @@ from faker import Faker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from studio_client.models import Studio
+from common.models import Studio
 from tests.api.factories import ConfirmationCodeFactory, StudioFactory
 from tests.utils import fake, client
 

@@ -9,7 +9,7 @@ from .views import (
     OrderViewSet, OrderPhotosCloudView
 )
 
-app_name = 'studio_client'
+app_name = 'studio'
 
 router = DefaultRouter()
 

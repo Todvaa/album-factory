@@ -7,7 +7,7 @@ from rest_framework.schemas import get_schema_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('studio/', include('studio_client.urls', namespace='studio_client')),
+    path('studio/', include('studio.urls', namespace='studio')),
     path('openapi/', get_schema_view(
             title='Album Factory',
             description='External API for studio and customer clients',
