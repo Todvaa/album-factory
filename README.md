@@ -17,6 +17,12 @@ DB_PORT=5432
 SECRET_KEY= # секретный ключ Django
 RABBITMQ_DEFAULT_USER=album_factory
 RABBITMQ_DEFAULT_PASS=album_factory
+RABBITMQ_PORT=5672
+MINIO_ROOT_USER=album_factory
+MINIO_ROOT_PASSWORD=album_factory
+MINIO_PORT=9000
+#dev/test/prod
+APP_ENV=dev
 ```
 3. Собрать контейнеры. Запуск из папки docker.  
 <br><pre>docker-compose up --build</pre><br>
@@ -29,3 +35,6 @@ RABBITMQ_DEFAULT_PASS=album_factory
 Веб интерфейс: http://localhost/openapi
 
 JSON формат: http://localhost/openapi/?format=openapi-json
+
+## RabbitMQ
+Веб интерфейс: http://localhost:15672

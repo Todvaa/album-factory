@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import (
 )
 
 from .views import (
-    StudioSignUpView, ConfirmationSendView, SchoolViewSet, OrderViewSet
+    StudioSignUpView, ConfirmationSendView, SchoolViewSet,
+    OrderViewSet, OrderPhotosCloudView
 )
 
 app_name = 'studio_client'
@@ -24,6 +25,10 @@ urlpatterns = [
     path('auth/signup/', StudioSignUpView.as_view(), name='sign_up'),
     path('auth/signin/', TokenObtainPairView.as_view(), name='get_token'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(
+        'order/<int:order_id>/photos/cloud',
+        OrderPhotosCloudView.as_view(),
+        name='order_photos_cloud'),
     path('', include(router.urls)),
 
 ]
