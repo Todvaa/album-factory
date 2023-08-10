@@ -3,11 +3,11 @@ import json
 
 from propan.brokers.rabbit import RabbitQueue
 
+from constants import MODULE_NAME
 from downloaders import YandexDownloader
-from photos_downloader.constants import MODULE_NAME
-from photos_downloader.uploaders import S3Uploader
 from shared.logger import logger
 from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
+from uploaders import S3Uploader
 
 photos_downloading_queue = RabbitQueue('photos_downloading')
 photos_downloaded_queue = RabbitQueue('photos_downloaded')

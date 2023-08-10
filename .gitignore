@@ -167,4 +167,4 @@ pg_tblspc/
 pg_notify/
 pg_serial/
 pg_subtrans/
-/factory_clients/static/
+/api/static/

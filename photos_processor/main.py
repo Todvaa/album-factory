@@ -7,9 +7,9 @@ from propan import RabbitBroker, PropanApp
 from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
 
 from classificators import Classificator
+from constants import ORIG_PH_DIR, MODULE_NAME
 from downloaders import S3Downloader
 from dto import Photo
-from photos_processor.constants import ORIG_PH_DIR, MODULE_NAME
 from recognizers import Recognizer
 from shared.logger import logger
 
@@ -18,9 +18,10 @@ load_dotenv()
 RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
 RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
 rabbitmq_broker = RabbitBroker(
     f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-    f'@localhost:{RABBITMQ_PORT}/'
+    f'@{RABBITMQ_HOST}:{RABBITMQ_PORT}/'
 )
 app = PropanApp(rabbitmq_broker)
 exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
@@ -64,7 +65,7 @@ async def photos_processing_handler(message):
 async def publish_vectors(data):
     async with RabbitBroker(
             f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-            f'@localhost:{RABBITMQ_PORT}/'
+            f'@{RABBITMQ_HOST}:{RABBITMQ_PORT}/'
     ) as broker:
         logger.info(
             module=MODULE_NAME,

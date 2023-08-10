@@ -6,9 +6,10 @@ services:
     volumes:
       - db:/var/lib/db/data/
     ports:
-      - '5432:5432'
+      - "${DB_PORT}:${DB_PORT}"
     env_file:
       - .env
+
   cache:
     image: redis:7.2-rc2-bookworm
     restart: always
@@ -16,35 +17,61 @@ services:
       - '6379:6379'
     volumes:
       - cache:/var/lib/redis/data
+
   queue:
     image: rabbitmq:3.10.7-management
     restart: always
+    expose:
+      - ${RABBITMQ_PORT}
     ports:
-      - '5672:5672'
       - '15672:15672'
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq
     env_file:
       - .env
-  factory_clients:
+
+  api:
     build:
-      dockerfile: docker/factory_clients/Dockerfile
+      dockerfile: docker/api/Dockerfile
       context: .
     restart: always
-    command: >
-      bash -c "python manage.py migrate --noinput &&
-      python manage.py collectstatic --noinput &&
-      gunicorn --bind 0.0.0.0:8000 factory_clients.wsgi"
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
-    ports:
-      - '8000:8000'
+    expose:
+      - "8000"
     depends_on:
       - db
+      - queue
+      - photos_downloader
+      - photos_processor
     env_file:
       - .env
+    entrypoint: "/app/entrypoint"
+
+  photos_downloader:
+    build:
+      dockerfile: docker/photos_downloader/Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - queue
+      - minio
+    env_file:
+      - .env
+
+  photos_processor:
+    build:
+      dockerfile: docker/photos_processor/Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - queue
+      - minio
+    env_file:
+      - .env
+
   nginx:
     image: nginx:1.19.3
     restart: always
@@ -55,17 +82,18 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - factory_clients
+      - api
+
   minio:
     image: bitnami/minio:2023.6.23-debian-11-r2
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "${S3_PORT}:${S3_PORT}"
     volumes:
       - minio_data:/var/lib/bitnami/data
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${S3_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${S3_ROOT_PASSWORD}
+
 volumes:
   static_value:
   media_value:

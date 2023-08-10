@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from customer_client.models import Order, OrderStatus
-from tests.factory_clients.factories import OrderFactory
+from tests.api.factories import OrderFactory
 from tests.utils import client
 
 

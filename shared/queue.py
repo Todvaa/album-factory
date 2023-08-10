@@ -9,13 +9,14 @@ load_dotenv()
 RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
 RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
 exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
 
 
 def get_rabbitmq_broker() -> RabbitBroker:
     return RabbitBroker(
         f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-        f'@localhost:{RABBITMQ_PORT}/'
+        f'@{RABBITMQ_HOST}:{RABBITMQ_PORT}/'
     )
 
 

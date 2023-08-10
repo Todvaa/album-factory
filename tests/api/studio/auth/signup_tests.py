@@ -1,14 +1,14 @@
 from datetime import datetime
+
 import pytest
 from dateutil.relativedelta import relativedelta
-from faker import Faker
-
 from django.utils import timezone
+from faker import Faker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from studio_client.models import Studio
-from tests.factory_clients.factories import ConfirmationCodeFactory, StudioFactory
+from tests.api.factories import ConfirmationCodeFactory, StudioFactory
 from tests.utils import fake, client
 
 

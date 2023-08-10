@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from customer_client.models import Order, OrderStatus
-from tests.factory_clients.factories import (
+from tests.api.factories import (
     StudioFactory, OrderFactory, SchoolFactory
 )
 from tests.utils import client

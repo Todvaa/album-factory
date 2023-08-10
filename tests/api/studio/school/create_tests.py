@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from tests.factory_clients.factories import SchoolFactory, StudioFactory
+from tests.api.factories import SchoolFactory, StudioFactory
 from tests.utils import client
 
 
