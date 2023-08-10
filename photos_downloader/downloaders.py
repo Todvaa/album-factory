@@ -3,14 +3,14 @@ import re
 import shutil
 import tempfile
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Tuple
 from urllib.parse import urlparse, parse_qsl, urlencode
 
 import requests
 from slugify import slugify
 
 from constants import (
-    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, SM_PH_SZ, LG_PH_SZ, PREVIEW_DIR, MODULE_NAME
+    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, PREVIEW_DIR, MODULE_NAME
 )
 from shared.logger import logger
 
@@ -34,6 +34,21 @@ class AbstractDownloader(ABC):
 class YandexDownloader(AbstractDownloader):
     # test cloud https://disk.yandex.ru/d/RTqLhx3YnUxUrQ
     API_METHOD = f'https://cloud-api.yandex.net/v1/disk/public/resources'
+    SM_PH_SZ = 'L'
+    LG_PH_SZ = 'XL'
+
+    def __prepare_dirs(self) -> Tuple[str, str, str]:
+        os.mkdir(self.downloads_dir)
+        preview_dir = os.path.join(self.downloads_dir, PREVIEW_DIR)
+        os.mkdir(preview_dir)
+        small_dir = os.path.join(preview_dir, SM_PH_DIR)
+        os.mkdir(small_dir)
+        large_dir = os.path.join(preview_dir, LG_PH_DIR)
+        os.mkdir(large_dir)
+        original_dir = os.path.join(self.downloads_dir, ORIG_PH_DIR)
+        os.mkdir(original_dir)
+
+        return small_dir, large_dir, original_dir
 
     def __get_photos_data(self) -> List[dict]:
         response = requests.get(url=f'{self.API_METHOD}?public_key={self.source}')
@@ -69,25 +84,23 @@ class YandexDownloader(AbstractDownloader):
 
     def run(self) -> str:
         logger.info(module=MODULE_NAME, message='start downloading from Yandex')
-        os.mkdir(self.downloads_dir)
-        preview_dir = os.path.join(self.downloads_dir, PREVIEW_DIR)
-        os.mkdir(preview_dir)
-        small_dir = os.path.join(preview_dir, SM_PH_DIR)
-        os.mkdir(small_dir)
-        large_dir = os.path.join(preview_dir, LG_PH_DIR)
-        os.mkdir(large_dir)
-        original_dir = os.path.join(self.downloads_dir, ORIG_PH_DIR)
-        os.mkdir(original_dir)
+        small_dir, large_dir, original_dir = self.__prepare_dirs()
         photos_data = self.__get_photos_data()
         for photo_data in photos_data:
             logger.info(
                 module=MODULE_NAME, message=f'downloading photo {photo_data["preview"]}'
             )
             small_photo = self.__download_content(
-                self.__change_size(photo_url=photo_data['preview'], new_size=SM_PH_SZ)
+                self.__change_size(
+                    photo_url=photo_data['preview'],
+                    new_size=self.SM_PH_SZ
+                )
             )
             large_photo = self.__download_content(
-                self.__change_size(photo_url=photo_data['preview'], new_size=LG_PH_SZ)
+                self.__change_size(
+                    photo_url=photo_data['preview'],
+                    new_size=self.LG_PH_SZ
+                )
             )
             original_photo = self.__download_content(photo_data['file'])
             photo_name = self.__change_name(current_name=photo_data['name'])
