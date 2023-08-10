@@ -7,7 +7,7 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 
-from customer.utils import generate_random_passcode
+from common.utils import generate_random_passcode
 from studio.constants import CODE_LIFETIME
 
 

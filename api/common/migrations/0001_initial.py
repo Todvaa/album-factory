@@ -5,7 +5,7 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import customer.utils
+import common.utils
 
 
 class Migration(migrations.Migration):
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                     django.core.validators.RegexValidator(
                         message='Номер телефона должен состоять из 10 цифр и начинаться с 9', regex='^9\\d{9}$')])),
                 ('albums_count', models.IntegerField()),
-                ('passcode', models.IntegerField(default=customer.utils.generate_random_passcode)),
+                ('passcode', models.IntegerField(default=common.utils.generate_random_passcode)),
                 ('status', models.CharField(
                     choices=[('created', 'Создан'), ('portraits_uploading', 'Загрузка портретов'),
                              ('portraits_uploaded', 'Портреты загружены'),
