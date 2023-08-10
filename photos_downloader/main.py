@@ -1,27 +1,13 @@
 import asyncio
 import json
-import os
 
-from dotenv import load_dotenv
-from propan import RabbitBroker, PropanApp
-from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
+from propan.brokers.rabbit import RabbitQueue
 
 from downloaders import YandexDownloader
 from photos_downloader.constants import MODULE_NAME
 from photos_downloader.uploaders import S3Uploader
 from shared.logger import logger
-
-load_dotenv()
-
-RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
-RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
-RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-rabbitmq_broker = RabbitBroker(
-    f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-    f'@localhost:{RABBITMQ_PORT}/'
-)
-app = PropanApp(rabbitmq_broker)
-exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
+from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
 
 photos_downloading_queue = RabbitQueue('photos_downloading')
 photos_downloaded_queue = RabbitQueue('photos_downloaded')
@@ -49,10 +35,7 @@ async def photos_downloading_handler(message):
 
 
 async def publish_photos(order_id, s3_path):
-    async with RabbitBroker(
-            f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-            f'@localhost:{RABBITMQ_PORT}/'
-    ) as broker:
+    async with get_rabbitmq_broker() as broker:
         logger.info(
             module=MODULE_NAME,
             message=f'pushing message to {photos_downloaded_queue.name}'
