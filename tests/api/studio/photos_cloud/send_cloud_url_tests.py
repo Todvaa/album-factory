@@ -12,7 +12,7 @@ from tests.utils import client
 class SendCloudUrlTests(APITestCase):
 
     @pytest.mark.django_db
-    @mock.patch('studio_client.events.PhotosUploadingEvent.handle')
+    @mock.patch('studio.events.PhotosUploadingEvent.handle')
     def test_correct(self, mock_handle):
         studio = StudioFactory()
         client.force_authenticate(user=studio)
