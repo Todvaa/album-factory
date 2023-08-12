@@ -24,6 +24,8 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'common.Studio'
 
 AUTHENTICATION_BACKENDS = [
+    'api.backends.StudioBackend',
+    'api.backends.OrderBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -94,7 +96,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.MultiJWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20
@@ -135,6 +137,7 @@ SIMPLE_JWT = {
     # todo: move td to env
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
     'AUTH_HEADER_TYPES': ('Bearer',),
+    "TOKEN_OBTAIN_SERIALIZER": "api.authentication.MultiTokenObtainPairSerializer",
 }
 
 # Internationalization

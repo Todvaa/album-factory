@@ -106,7 +106,7 @@ class ConfirmationCode(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('email', 'action_type', ),
+                fields=('email', 'action_type',),
                 name='unique pair'
             )
         ]
@@ -151,6 +151,10 @@ class OrderStatus(Enum):
 
 
 class Order(models.Model):
+    # damned django`s users
+    is_authenticated = True  # not sure that it`s correct
+    is_active = True
+
     class_index = models.CharField(
         max_length=4,
         blank=False,

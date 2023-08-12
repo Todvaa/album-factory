@@ -72,6 +72,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    # todo: move to common?
     class Meta:
         model = Order
         fields = (

@@ -1,4 +1,3 @@
-import pytest
 from parameterized import parameterized
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -11,7 +10,6 @@ from tests.utils import client
 
 
 class CreateTests(APITestCase):
-    @pytest.mark.django_db
     def test_required(self):
         studio = StudioFactory()
         order = OrderFactory.build()
@@ -46,7 +44,6 @@ class CreateTests(APITestCase):
         self.assertEqual(order.status, OrderStatus.created.name)
         self.assertGreaterEqual(order.passcode, 100000)
 
-    @pytest.mark.django_db
     def test_optional(self):
         studio = StudioFactory()
         school = SchoolFactory()
@@ -90,7 +87,6 @@ class CreateTests(APITestCase):
         self.assertEqual(order.status, OrderStatus.created.name)
         self.assertGreaterEqual(order.passcode, 100000)
 
-    @pytest.mark.django_db
     @parameterized.expand([status.name for status in OrderStatus])
     def test_set_status(self, new):
         studio = StudioFactory()
@@ -111,7 +107,6 @@ class CreateTests(APITestCase):
         )
         self.assertEqual(Order.objects.count(), 0)
 
-    @pytest.mark.django_db
     def test_unauthorized(self):
         order = OrderFactory.build()
         client.force_authenticate(user=None)
@@ -128,7 +123,6 @@ class CreateTests(APITestCase):
         )
         self.assertEqual(Order.objects.count(), 0)
 
-    @pytest.mark.django_db
     def test_empty(self):
         studio = StudioFactory()
         client.force_authenticate(user=studio)
