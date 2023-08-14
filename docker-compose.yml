@@ -6,7 +6,7 @@ services:
     volumes:
       - db:/var/lib/db/data/
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - '${DB_PORT}:${DB_PORT}'
     env_file:
       - .env
 
@@ -40,7 +40,7 @@ services:
       - static_value:/app/static/
       - media_value:/app/media/
     expose:
-      - "8000"
+      - '8000'
     depends_on:
       - db
       - queue
@@ -48,7 +48,7 @@ services:
       - photos_processor
     env_file:
       - .env
-    entrypoint: "/app/entrypoint"
+    entrypoint: '/app/entrypoint'
 
   photos_downloader:
     build:
@@ -87,7 +87,8 @@ services:
   minio:
     image: bitnami/minio:2023.6.23-debian-11-r2
     ports:
-      - "${S3_PORT}:${S3_PORT}"
+      - '${S3_PORT}:${S3_PORT}'
+      - '${S3_WEB_PORT}:${S3_WEB_PORT}'
     volumes:
       - minio_data:/var/lib/bitnami/data
     environment:
