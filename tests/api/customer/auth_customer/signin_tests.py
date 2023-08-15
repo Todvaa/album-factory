@@ -7,7 +7,7 @@ from tests.utils import client
 from .me_tests import check_token
 
 
-class SigninTests(APITestCase):
+class SignInTests(APITestCase):
     @pytest.mark.django_db
     def test_valid(self):
         order = OrderFactory()

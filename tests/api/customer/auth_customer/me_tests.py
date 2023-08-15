@@ -12,6 +12,7 @@ def check_token(test: APITestCase, token: str):
     client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
     response = client.get('/customer/auth/me/')
     test.assertEqual(response.status_code, status.HTTP_200_OK)
+
     return response
 
 
