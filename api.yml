@@ -3,6 +3,242 @@ info:
   title: ''
   version: ''
 paths:
+  /studio/school/:
+    get:
+      operationId: listSchools
+      description: ''
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=4
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=2
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/School'
+          description: ''
+      tags:
+        - studio
+    post:
+      operationId: createSchool
+      description: ''
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/School'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/School'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/School'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/School'
+          description: ''
+      tags:
+        - studio
+  /studio/school/{id}/:
+    get:
+      operationId: retrieveSchool
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: A unique integer value identifying this school.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/School'
+          description: ''
+      tags:
+        - studio
+  /studio/order/:
+    get:
+      operationId: listOrders
+      description: ''
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=4
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=2
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+          description: ''
+      tags:
+        - studio
+    post:
+      operationId: createOrder
+      description: ''
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+      tags:
+        - studio
+  /studio/order/{id}/:
+    get:
+      operationId: retrieveOrder
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+      tags:
+        - studio
+    put:
+      operationId: updateOrder
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+      tags:
+        - studio
+    patch:
+      operationId: partialUpdateOrder
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+      tags:
+        - studio
   /studio/auth/confirmation_send/:
     post:
       operationId: createConfirmationSend
@@ -109,8 +345,107 @@ paths:
           description: ''
       tags:
       - studio
+  /studio/order/{order_id}/photos/cloud:
+    post:
+      operationId: createOrderPhotosCloud
+      description: ''
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderPhotosCloud'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderPhotosCloud'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderPhotosCloud'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPhotosCloud'
+          description: ''
+      tags:
+        - studio
 components:
   schemas:
+    School:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 255
+      required:
+        - full_name
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        class_index:
+          type: string
+          pattern: "^(?:[1-9]|1[0-1]) [\u0410-\u042F]$"
+          maxLength: 4
+        customer_first_name:
+          type: string
+          maxLength: 150
+        customer_last_name:
+          type: string
+          maxLength: 150
+        customer_middle_name:
+          type: string
+          nullable: true
+          maxLength: 150
+        phone_number:
+          type: string
+          nullable: true
+          pattern: ^9\d{9}$
+          maxLength: 10
+        albums_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        passcode:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          enum:
+            - created
+            - portraits_uploading
+            - portraits_uploaded
+            - portraits_processing
+            - portraits_processed
+            - layout
+            - agreement
+            - printing
+            - completed
+            - rejected
+          type: string
+        studio:
+          type: string
+          readOnly: true
+        school:
+          type: integer
+          nullable: true
+      required:
+        - class_index
+        - customer_first_name
+        - customer_last_name
+        - albums_count
     ConfirmationSend:
       type: object
       properties:
@@ -167,3 +502,16 @@ components:
           readOnly: true
       required:
       - refresh
+    OrderPhotosCloud:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          pattern: "^(?:[a-z0-9.+-]*)://(?:[^\\s:@/]+(?::[^\\s:@/]*)?@)?(?:(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)(?:\\\
+            .(?:0|25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?)){3}|\\[[0-9a-f:.]+\\\
+            ]|([a-z\xA1-\uFFFF0-9](?:[a-z\xA1-\uFFFF0-9-]{0,61}[a-z\xA1-\uFFFF0-9])?(?:\\\
+            .(?!-)[a-z\xA1-\uFFFF0-9-]{1,63}(?<!-))*\\.(?!-)(?:[a-z\xA1-\uFFFF-]{2,63}|xn--[a-z0-9]{1,59})(?<!-)\\\
+            .?|localhost))(?::[0-9]{1,5})?(?:[/?#][^\\s]*)?\\z"
+      required:
+        - url
