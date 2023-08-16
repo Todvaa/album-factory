@@ -9,7 +9,7 @@ from urllib.parse import urlparse, parse_qsl, urlencode
 import requests
 from slugify import slugify
 
-from constants import (
+from photos_downloader.constants import (
     SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, PREVIEW_DIR, MODULE_NAME
 )
 from shared.logger import logger

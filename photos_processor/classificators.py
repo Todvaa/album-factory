@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from scipy.spatial.distance import pdist
 
-from constants import EQUALITY_FACTOR, MODULE_NAME
-from dto import Person
+from photos_processor.constants import EQUALITY_FACTOR, MODULE_NAME
+from photos_processor.dto import Person
 from shared.logger import logger
 
 
