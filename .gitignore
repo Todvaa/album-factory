@@ -147,6 +147,7 @@ dmypy.json
 
 # Other
 media
+docker-compose.override.yml
 
 #cache
 tmp*

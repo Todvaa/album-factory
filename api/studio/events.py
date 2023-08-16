@@ -1,23 +1,14 @@
 import asyncio
 import json
-import os
 from abc import ABC, abstractmethod
 
-from dotenv import load_dotenv
-from propan import RabbitBroker
-from propan.brokers.rabbit import RabbitExchange, ExchangeType, RabbitQueue
+from propan.brokers.rabbit import RabbitQueue
 
-load_dotenv()
+from shared.queue import exchange, get_rabbitmq_broker
 
 
 class AbstractEvent(ABC):
-    RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
-    RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
-    RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-    rabbitmq_broker = RabbitBroker(
-        f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-        f'@localhost:{RABBITMQ_PORT}/'
-    )
+    rabbitmq_broker = get_rabbitmq_broker()
 
     @abstractmethod
     def handle(self):
@@ -28,7 +19,7 @@ class AbstractEvent(ABC):
 
 
 class PhotosUploadingEvent(AbstractEvent):
-    exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
+    exchange = exchange
     photos_downloading_queue = RabbitQueue('photos_downloading')
 
     def __init__(self, url: str, order_id: int):
