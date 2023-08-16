@@ -17,14 +17,14 @@ class AbstractRecognizer(ABC):
     def _handle(self, file_path: str):
         pass
 
-    def run(self) -> dict:
+    def run(self) -> list:
         logger.info(module=MODULE_NAME, message='Face recognition launched')
-        vectors = {}
+        photos_with_vectors = []
         for photo in self.photos:
             vector = self._handle(os.path.join(self.dir_path, photo.name))
             if vector is not None:
                 photo.append_vector(vector=vector)
-                vectors[photo.name] = vector
+                photos_with_vectors.append(photo)
             else:
                 logger.info(
                     module=MODULE_NAME,
@@ -32,7 +32,7 @@ class AbstractRecognizer(ABC):
                 )
         logger.info(module=MODULE_NAME, message='Face recognition finished')
 
-        return vectors
+        return photos_with_vectors
 
 
 # todo: crop photos
@@ -41,7 +41,7 @@ class Recognizer(AbstractRecognizer):
         img = cv2.imread(file_path)
         vector_faces = face_recognition.face_encodings(img)
         if len(vector_faces) == 1:
-            vector = face_recognition.face_encodings(img)[0]
+            vector = vector_faces[0]
         else:
             vector = None
 

@@ -2,9 +2,7 @@ import asyncio
 import json
 import os
 
-from dotenv import load_dotenv
-from propan import RabbitBroker, PropanApp
-from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
+from propan.brokers.rabbit import RabbitQueue
 
 from classificators import Classificator
 from constants import ORIG_PH_DIR, MODULE_NAME
@@ -12,19 +10,7 @@ from downloaders import S3Downloader
 from dto import Photo
 from recognizers import Recognizer
 from shared.logger import logger
-
-load_dotenv()
-
-RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
-RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
-RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
-rabbitmq_broker = RabbitBroker(
-    f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-    f'@{RABBITMQ_HOST}:{RABBITMQ_PORT}/'
-)
-app = PropanApp(rabbitmq_broker)
-exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
+from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
 
 photos_processing_queue = RabbitQueue('photos_processing')
 photos_processed_queue = RabbitQueue('photos_processed')
@@ -39,14 +25,14 @@ async def photos_processing_handler(message):
     downloader = S3Downloader(order_id=order_id, s3_path=s3_path)
     local_path = downloader.run()
     photos = [
-        Photo(name=name).set_remote_url(
-            remote_url=s3_path + name
+        Photo(
+            name=name, remote_url=s3_path + name
         ) for name in os.listdir(local_path)
     ]
     recognizer = Recognizer(dir_path=local_path, photos=photos)
-    persons_vectors = recognizer.run()
+    photos_with_vectors = recognizer.run()
     downloader.clean()
-    classificator = Classificator(vectors=persons_vectors)
+    classificator = Classificator(photos=photos_with_vectors)
     persons = classificator.run()
     data = {
         'order_id': order_id,
@@ -55,7 +41,12 @@ async def photos_processing_handler(message):
                 's3_url': photo.remote_url, 'face_count': photo.face_count
             } for photo in photos
         ],
-        'persons': persons
+        'persons': [
+            {
+                'photos': person.photo_names,
+                'vector': person.average_vector
+            } for person in persons
+        ]
     }
 
     await publish_vectors(data=data)
@@ -63,10 +54,7 @@ async def photos_processing_handler(message):
 
 
 async def publish_vectors(data):
-    async with RabbitBroker(
-            f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}'
-            f'@{RABBITMQ_HOST}:{RABBITMQ_PORT}/'
-    ) as broker:
+    async with get_rabbitmq_broker() as broker:
         logger.info(
             module=MODULE_NAME,
             message=f'pushing message to {photos_processed_queue.name}'
