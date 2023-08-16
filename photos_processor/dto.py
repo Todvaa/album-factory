@@ -19,7 +19,7 @@ class Person:
         self.average_vector = None
 
     def __calculate_avg_vector(self):
-        return sum(self.vectors) / len(self.vectors)
+        self.average_vector = sum(self.vectors) / len(self.vectors)
 
     def add_photo(self, file_name, vector):
         self.photo_names.append(file_name)
