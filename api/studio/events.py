@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from propan.brokers.rabbit import RabbitQueue
 
-from shared.queue import exchange, get_rabbitmq_broker
+from .shared.queue import exchange, get_rabbitmq_broker
 
 
 class AbstractEvent(ABC):
