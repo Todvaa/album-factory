@@ -3,7 +3,7 @@ import shutil
 import tempfile
 from abc import ABC, abstractmethod
 
-from constants import MODULE_NAME
+from photos_processor.constants import MODULE_NAME
 from shared.logger import logger
 from shared.s3 import FILE_SYSTEM
 

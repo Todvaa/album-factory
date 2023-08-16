@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import cv2
 import face_recognition
 
-from constants import MODULE_NAME
+from photos_processor.constants import MODULE_NAME
 from shared.logger import logger
 
 

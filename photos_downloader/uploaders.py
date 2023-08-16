@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from constants import BUCKET_PHOTO, MODULE_NAME
+from photos_downloader.constants import BUCKET_PHOTO, MODULE_NAME
 from shared.logger import logger
 from shared.s3 import FILE_SYSTEM
 
