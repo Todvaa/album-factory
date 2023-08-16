@@ -5,8 +5,10 @@ services:
     restart: always
     volumes:
       - db:/var/lib/db/data/
+    expose:
+      - ${DB_PORT}
     ports:
-      - '${DB_PORT}:${DB_PORT}'
+      - '${DB_EXTERNAL_PORT}:${DB_PORT}'
     env_file:
       - .env
 
@@ -48,7 +50,7 @@ services:
       - photos_processor
     env_file:
       - .env
-    entrypoint: '/app/entrypoint'
+    entrypoint: '/bin/bash /app/entrypoint'
 
   photos_downloader:
     build:
@@ -86,6 +88,7 @@ services:
 
   minio:
     image: bitnami/minio:2023.6.23-debian-11-r2
+    restart: always
     ports:
       - '${S3_PORT}:${S3_PORT}'
       - '${S3_WEB_PORT}:${S3_WEB_PORT}'
