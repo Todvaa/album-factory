@@ -4,6 +4,7 @@ class Photo:
         self.face_count = 0
         self.remote_url = remote_url
         self.vectors = []
+        self.is_eyes_open = []
 
     def append_vector(self, vector):
         self.vectors.append(vector)
