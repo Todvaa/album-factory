@@ -1,10 +1,10 @@
 from django.urls import path
 
-from .views import StudioSignInView, MeView
+from .views import CustomerSignInView, MeView
 
 app_name = 'order'
 
 urlpatterns = [
-    path('auth/signin/', StudioSignInView.as_view(), name='signin'),
+    path('auth/signin/', CustomerSignInView.as_view(), name='signin'),
     path('auth/me/', MeView.as_view(), name='me'),
 ]

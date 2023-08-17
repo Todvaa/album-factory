@@ -1,6 +1,7 @@
 import os
 
 from aiormq import AMQPConnectionError
+from api.authentication import NAMESPACE_ATTRIBUTE, NAMESPACE_STUDIO
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
@@ -14,6 +15,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenViewBase
 
 from common.models import ConfirmationCode, Studio, School, OrderStatus, Order
 from .events import PhotosUploadingEvent
@@ -21,7 +23,7 @@ from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
 from .permissions import IsOwner
 from .serializers import (
     ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
-    OrderSerializer, OrderPhotosCloudSerializer
+    OrderSerializer, OrderPhotosCloudSerializer, StudioSerializer, CustomTokenObtainPairSerializer
 )
 from .utils import generate_random_code
 
@@ -51,12 +53,24 @@ class StudioSignUpView(GenericAPIView):
             })
 
         refresh = RefreshToken.for_user(studio)
+        refresh[NAMESPACE_ATTRIBUTE] = NAMESPACE_STUDIO
         response_data = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }
 
         return Response(response_data)
+
+
+class CustomTokenObtainPairView(TokenViewBase):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class MeView(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        return Response(StudioSerializer(request.user).data)
 
 
 class ConfirmationSendView(GenericAPIView):

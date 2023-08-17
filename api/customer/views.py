@@ -1,5 +1,4 @@
 from api.authentication import NAMESPACE_ATTRIBUTE, NAMESPACE_CUSTOMER
-from django.utils.translation import gettext_lazy as _
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -7,11 +6,10 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.models import Order
-from studio.serializers import OrderSerializer
-from .serializers import SignInSerializer
+from .serializers import SignInSerializer, OrderSerializer
 
 
-class StudioSignInView(GenericAPIView):
+class CustomerSignInView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SignInSerializer
 
@@ -27,7 +25,7 @@ class StudioSignInView(GenericAPIView):
                 passcode=passcode,
             )
         except Order.DoesNotExist:
-            raise AuthenticationFailed(_('User not found'), code='user_not_found')
+            raise AuthenticationFailed('User not found', code='user_not_found')
 
         refresh = RefreshToken.for_user(order)
         refresh[NAMESPACE_ATTRIBUTE] = NAMESPACE_CUSTOMER

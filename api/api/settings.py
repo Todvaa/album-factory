@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+TOKEN_LIFE = float(os.getenv('TOKEN_LIFE'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -134,10 +135,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SIMPLE_JWT = {
-    # todo: move td to env
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=TOKEN_LIFE),
     'AUTH_HEADER_TYPES': ('Bearer',),
-    "TOKEN_OBTAIN_SERIALIZER": "api.authentication.MultiTokenObtainPairSerializer",
+    'TOKEN_OBTAIN_SERIALIZER': 'api.authentication.MultiTokenObtainPairSerializer',
 }
 
 # Internationalization

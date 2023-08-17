@@ -1,9 +1,12 @@
 from urllib.parse import urlparse
 
+from api.authentication import NAMESPACE_ATTRIBUTE, NAMESPACE_STUDIO
 from django.core.validators import validate_email
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from common.models import ConfirmationCode, School, OrderStatus, Order
+from common.models import ConfirmationCode, School, OrderStatus, Order, Studio
 from .constants import VALID_DOMAINS
 
 
@@ -39,6 +42,15 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        refresh = RefreshToken.for_user(user)
+        refresh[NAMESPACE_ATTRIBUTE] = NAMESPACE_STUDIO
+
+        return refresh
+
+
 class OrderPhotosCloudSerializer(serializers.Serializer):
     url = serializers.URLField()
 
@@ -72,7 +84,6 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    # todo: move to common?
     class Meta:
         model = Order
         fields = (
@@ -98,3 +109,14 @@ class OrderSerializer(serializers.ModelSerializer):
                 return value
             case _:
                 raise serializers.ValidationError(['Недопустимое изменение статуса'])
+
+
+class StudioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Studio
+        fields = (
+            'id', 'email', 'name',
+        )
+        read_only_fields = (
+            'id', 'email', 'name',
+        )
