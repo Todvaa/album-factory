@@ -285,3 +285,22 @@ class Photo(models.Model):
         blank=False,
         null=False,
     )
+    person = models.ForeignKey(
+        'common.PersonStudent',
+        on_delete=models.CASCADE,
+        related_name='person_student'
+    )
+
+
+class PersonStudent(models.Model):
+    vector = models.TextField(
+        blank=False,
+        null=False
+    )
+    order = models.ForeignKey(
+        'common.Order',
+        on_delete=models.CASCADE,
+        related_name='order',
+        blank=False,
+        null=False
+    )
