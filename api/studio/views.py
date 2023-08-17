@@ -23,7 +23,7 @@ from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
 from .permissions import IsOwner
 from .serializers import (
     ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
-    OrderSerializer, OrderPhotosCloudSerializer, StudioSerializer, CustomTokenObtainPairSerializer
+    OrderSerializer, OrderPhotosCloudSerializer, StudioSerializer, StudioTokenObtainPairSerializer
 )
 from .utils import generate_random_code
 
@@ -62,8 +62,8 @@ class StudioSignUpView(GenericAPIView):
         return Response(response_data)
 
 
-class CustomTokenObtainPairView(TokenViewBase):
-    serializer_class = CustomTokenObtainPairSerializer
+class StudioTokenObtainPairView(TokenViewBase):
+    serializer_class = StudioTokenObtainPairSerializer
 
 
 class MeView(GenericAPIView):

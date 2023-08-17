@@ -137,7 +137,6 @@ AUTH_PASSWORD_VALIDATORS = [
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=TOKEN_LIFE),
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'TOKEN_OBTAIN_SERIALIZER': 'api.authentication.MultiTokenObtainPairSerializer',
 }
 
 # Internationalization

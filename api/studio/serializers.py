@@ -42,7 +42,7 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+class StudioTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         refresh = RefreshToken.for_user(user)

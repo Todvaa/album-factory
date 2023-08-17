@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     StudioSignUpView, ConfirmationSendView, SchoolViewSet, OrderViewSet,
-    OrderPhotosCloudView, MeView, CustomTokenObtainPairView,
+    OrderPhotosCloudView, MeView, StudioTokenObtainPairView,
 )
 
 app_name = 'studio'
@@ -21,7 +21,7 @@ urlpatterns = [
         name='confirmation_send'
     ),
     path('auth/signup/', StudioSignUpView.as_view(), name='sign_up'),
-    path('auth/signin/', CustomTokenObtainPairView.as_view(), name='get_token'),
+    path('auth/signin/', StudioTokenObtainPairView.as_view(), name='get_token'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/me/', MeView.as_view(), name='me'),
     path(
