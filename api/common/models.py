@@ -268,3 +268,20 @@ class PersonStaff(models.Model):
             f'{self.last_name} / {self.school.full_name}'
             f' / {self.school_subject}'
         )
+
+
+class Photo(models.Model):
+    order_id = models.IntegerField(
+        blank=False,
+        null=False,
+    )
+    s3_url = models.CharField(
+        max_length=255,
+        blank=False,
+        null=False,
+        unique=True
+    )
+    faces_count = models.IntegerField(
+        blank=False,
+        null=False,
+    )
