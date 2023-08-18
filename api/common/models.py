@@ -151,8 +151,8 @@ class OrderStatus(Enum):
 
 
 class Order(models.Model):
-    is_authenticated = models.BooleanField(default=True)
-    is_active = models.BooleanField(default=True)
+    is_authenticated = True
+    is_active = True
 
     class_index = models.CharField(
         max_length=4,
