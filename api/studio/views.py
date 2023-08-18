@@ -116,11 +116,16 @@ class OrderPhotosCloudView(GenericAPIView):
 
 
 class SchoolViewSet(CreateRetrieveListViewSet):
-    queryset = School.objects.all()
     serializer_class = SchoolSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (SearchFilter,)
     search_fields = ('full_name',)
+
+    def perform_create(self, serializer):
+        serializer.save(studio=self.request.user)
+
+    def get_queryset(self):
+        return School.objects.filter(studio=self.request.user)
 
 
 class OrderViewSet(CreateRetrieveListUpdateViewSet):

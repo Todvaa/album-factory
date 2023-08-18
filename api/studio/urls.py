@@ -30,5 +30,4 @@ urlpatterns = [
         OrderPhotosCloudView.as_view(),
         name='order_photos_cloud'),
     path('', include(router.urls)),
-
 ]

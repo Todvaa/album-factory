@@ -48,6 +48,8 @@ class SchoolFactory(factory.django.DjangoModelFactory):
 
     full_name = factory.LazyAttribute(lambda _: 'Школа #' + str(randint(100, 999999)))
 
+    studio = factory.SubFactory(StudioFactory)
+
 
 class OrderFactory(factory.django.DjangoModelFactory):
     class Meta:
