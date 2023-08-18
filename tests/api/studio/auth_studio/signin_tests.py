@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from tests.api.factories import StudioFactory
+from tests.api.studio.auth_studio.me_tests import check_token
 from tests.utils import client
 
 
@@ -15,7 +16,10 @@ class SigninTests(APITestCase):
             'password': 'password',
         })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("refresh", response.data)
+        self.assertIn('refresh', response.data)
+        self.assertIn('access', response.data)
+        token = response.data['access']
+        check_token(self, token)
 
     @pytest.mark.django_db
     def test_invalid(self):

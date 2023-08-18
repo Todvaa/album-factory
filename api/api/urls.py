@@ -5,9 +5,11 @@ from django.urls import path, include
 from rest_framework.permissions import AllowAny
 from rest_framework.schemas import get_schema_view
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('studio/', include('studio.urls', namespace='studio')),
+    path('customer/', include('customer.urls', namespace='customer')),
     path('openapi/', get_schema_view(
             title='Album Factory',
             description='External API for studio and customer clients',

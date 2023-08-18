@@ -21,10 +21,9 @@ class SignupTests(APITestCase):
             'code': confirmation_code.code,
             'password': fake.password()
         })
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("refresh", response.data)
-        self.assertIn("access", response.data)
+        self.assertIn('refresh', response.data)
+        self.assertIn('access', response.data)
         self.assertEqual(Studio.objects.count(), 1)
         self.assertEqual(Studio.objects.get().email, confirmation_code.email)
 
@@ -39,8 +38,8 @@ class SignupTests(APITestCase):
             'name': name
         })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("refresh", response.data)
-        self.assertIn("access", response.data)
+        self.assertIn('refresh', response.data)
+        self.assertIn('access', response.data)
         self.assertEqual(Studio.objects.count(), 1)
         self.assertEqual(Studio.objects.get().email, confirmation_code.email)
         self.assertEqual(Studio.objects.get().name, name)
@@ -68,7 +67,6 @@ class SignupTests(APITestCase):
             'code': confirmation_code.code,
             'password': fake.password(),
         })
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Ошибка при регистрации, почта уже используется'})
 
