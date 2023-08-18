@@ -93,8 +93,6 @@ class StudioTokenObtainPairView(GenericAPIView):
 
 
 class MeView(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-
     def get(self, request):
         return Response(StudioSerializer(request.user).data)
 
@@ -137,7 +135,6 @@ class ConfirmationSendView(GenericAPIView):
 
 class OrderPhotosCloudView(GenericAPIView):
     serializer_class = OrderPhotosCloudSerializer
-    permission_classes = (IsAuthenticated,)
 
     def post(self, request, order_id):
         order = get_object_or_404(Order, id=order_id, studio=request.user)
@@ -157,7 +154,6 @@ class OrderPhotosCloudView(GenericAPIView):
 
 class SchoolViewSet(CreateRetrieveListViewSet):
     serializer_class = SchoolSerializer
-    permission_classes = (IsAuthenticated,)
     filter_backends = (SearchFilter,)
     search_fields = ('full_name',)
 
