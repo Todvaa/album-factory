@@ -29,4 +29,4 @@ class SigninTests(APITestCase):
             'password': 'invalid',
         })
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data, {'detail': 'No active account found with the given credentials'})
+        self.assertEqual(response.data, {'detail': 'User not found'})

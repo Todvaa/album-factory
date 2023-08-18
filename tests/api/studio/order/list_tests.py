@@ -11,7 +11,7 @@ class ListTests(APITestCase):
     @pytest.mark.django_db
     def test_default(self):
         studio = StudioFactory()
-        client.force_login(user=studio)
+        client.force_authenticate(user=studio)
         OrderFactory.create_batch(50, studio=studio)
         response = client.get('/studio/order/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

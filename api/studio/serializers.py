@@ -1,10 +1,7 @@
 from urllib.parse import urlparse
 
-from api.authentication import NAMESPACE_ATTRIBUTE, NAMESPACE_STUDIO
 from django.core.validators import validate_email
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.models import ConfirmationCode, School, OrderStatus, Order, Studio
 from .constants import VALID_DOMAINS
@@ -42,13 +39,11 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
-class StudioTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        refresh = RefreshToken.for_user(user)
-        refresh[NAMESPACE_ATTRIBUTE] = NAMESPACE_STUDIO
-
-        return refresh
+class SignInSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        max_length=255, required=True, validators=(validate_email,)
+    )
+    password = serializers.CharField(max_length=150, required=True)
 
 
 class OrderPhotosCloudSerializer(serializers.Serializer):

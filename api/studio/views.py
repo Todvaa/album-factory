@@ -3,19 +3,19 @@ import os
 from aiormq import AMQPConnectionError
 from api.authentication import NAMESPACE_ATTRIBUTE, NAMESPACE_STUDIO
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenViewBase
 
 from common.models import ConfirmationCode, Studio, School, OrderStatus, Order
 from .events import PhotosUploadingEvent
@@ -23,7 +23,7 @@ from .mixins import CreateRetrieveListViewSet, CreateRetrieveListUpdateViewSet
 from .permissions import IsOwner
 from .serializers import (
     ConfirmationSendSerializer, SignUpSerializer, SchoolSerializer,
-    OrderSerializer, OrderPhotosCloudSerializer, StudioSerializer, StudioTokenObtainPairSerializer
+    OrderSerializer, OrderPhotosCloudSerializer, StudioSerializer, SignInSerializer
 )
 from .utils import generate_random_code
 
@@ -62,8 +62,34 @@ class StudioSignUpView(GenericAPIView):
         return Response(response_data)
 
 
-class StudioTokenObtainPairView(TokenViewBase):
-    serializer_class = StudioTokenObtainPairSerializer
+class StudioTokenObtainPairView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = SignInSerializer
+
+    def post(self, request):
+        serializer = SignInSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')
+
+        try:
+            studio = Studio.objects.get(
+                email=email,
+            )
+        except Studio.DoesNotExist:
+            raise AuthenticationFailed('User not found', code='user_not_found')
+
+        if not check_password(password, studio.password):
+            raise AuthenticationFailed('User not found', code='user_not_found')
+
+        refresh = RefreshToken.for_user(studio)
+        refresh[NAMESPACE_ATTRIBUTE] = NAMESPACE_STUDIO
+        response_data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+
+        return Response(response_data)
 
 
 class MeView(GenericAPIView):
