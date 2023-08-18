@@ -127,6 +127,11 @@ class School(models.Model):
         blank=False,
         null=False,
     )
+    studio = models.ForeignKey(
+        'common.Studio',
+        on_delete=models.CASCADE,
+        related_name='school'
+    )
 
     class Meta:
         ordering = ['id']
