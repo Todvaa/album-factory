@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import CustomerSignInView, MeView
 
-app_name = 'order'
+app_name = 'customer'
 
 urlpatterns = [
     path('auth/signin/', CustomerSignInView.as_view(), name='signin'),
