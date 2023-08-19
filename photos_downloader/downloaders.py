@@ -35,7 +35,7 @@ class YandexDownloader(AbstractDownloader):
     # test cloud https://disk.yandex.ru/d/RTqLhx3YnUxUrQ
     API_METHOD = f'https://cloud-api.yandex.net/v1/disk/public/resources'
     SM_PH_SZ = 'L'
-    LG_PH_SZ = 'XL'
+    LG_PH_SZ = 'XXXL'
 
     def __prepare_dirs(self) -> Tuple[str, str, str]:
         os.mkdir(self.downloads_dir)

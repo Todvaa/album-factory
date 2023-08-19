@@ -5,7 +5,7 @@ import os
 from propan.brokers.rabbit import RabbitQueue
 
 from classificators import Classificator
-from constants import ORIG_PH_DIR, MODULE_NAME
+from constants import ORIG_PH_DIR, MODULE_NAME, PREVIEW_DIR, LG_PH_DIR
 from downloaders import S3Downloader
 from dto import Photo
 from recognizers import Recognizer
@@ -21,12 +21,14 @@ async def photos_processing_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
     order_id = message['order_id']
-    s3_path = message['s3_path'] + f'{order_id}/{ORIG_PH_DIR}/'
-    downloader = S3Downloader(order_id=order_id, s3_path=s3_path)
+    s3_path = message['s3_path']
+    original_path = s3_path + f'{order_id}/{ORIG_PH_DIR}/'
+    download_path = s3_path + f'{order_id}/{PREVIEW_DIR}/{LG_PH_DIR}/'
+    downloader = S3Downloader(order_id=order_id, s3_path=download_path)
     local_path = downloader.run()
     photos = [
         Photo(
-            name=name, remote_url=s3_path + name
+            name=name, remote_url=original_path + name
         ) for name in os.listdir(local_path)
     ]
     recognizer = Recognizer(dir_path=local_path, photos=photos)
@@ -38,7 +40,8 @@ async def photos_processing_handler(message):
         'order_id': order_id,
         'images': [
             {
-                's3_url': photo.remote_url, 'face_count': photo.face_count
+                's3_url': photo.remote_url,
+                'face_count': photo.face_count
             } for photo in photos
         ],
         'persons': [

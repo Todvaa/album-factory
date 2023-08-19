@@ -13,3 +13,7 @@ FILE_SYSTEM = S3FileSystem(
     key=S3_ROOT_USER, secret=S3_ROOT_PASSWORD,
     endpoint_url=S3_URL
 )
+
+
+def get_photo_url():
+    pass

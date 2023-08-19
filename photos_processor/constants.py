@@ -1,3 +1,5 @@
+PREVIEW_DIR = 'preview'
+LG_PH_DIR = 'large'
 ORIG_PH_DIR = 'original'
 EQUALITY_FACTOR = 0.5
 MODULE_NAME = 'PHOTOS_PROCESSOR'
