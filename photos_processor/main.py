@@ -5,12 +5,14 @@ import os
 from propan.brokers.rabbit import RabbitQueue
 
 from classificators import Classificator
-from constants import ORIG_PH_DIR, MODULE_NAME, PREVIEW_DIR, LG_PH_DIR
+from constants import MODULE_NAME
 from downloaders import S3Downloader
 from dto import Photo
 from recognizers import Recognizer
+from shared.constants import ORIGINAL_PH, RECOGNITION_PATH
 from shared.logger import logger
 from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
+from shared.s3 import get_photo_url
 
 photos_processing_queue = RabbitQueue('photos_processing')
 photos_processed_queue = RabbitQueue('photos_processed')
@@ -22,13 +24,16 @@ async def photos_processing_handler(message):
     message = json.loads(message)
     order_id = message['order_id']
     s3_path = message['s3_path']
-    original_path = s3_path + f'{order_id}/{ORIG_PH_DIR}/'
-    download_path = s3_path + f'{order_id}/{PREVIEW_DIR}/{LG_PH_DIR}/'
+    download_path = s3_path + f'{order_id}/' + RECOGNITION_PATH
     downloader = S3Downloader(order_id=order_id, s3_path=download_path)
     local_path = downloader.run()
     photos = [
         Photo(
-            name=name, remote_url=original_path + name
+            name=name, remote_url=get_photo_url(
+                order_id=order_id,
+                photo_name=name,
+                size=ORIGINAL_PH
+            )
         ) for name in os.listdir(local_path)
     ]
     recognizer = Recognizer(dir_path=local_path, photos=photos)

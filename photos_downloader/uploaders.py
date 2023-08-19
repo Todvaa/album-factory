@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from photos_downloader.constants import BUCKET_PHOTO, MODULE_NAME
+from photos_downloader.constants import MODULE_NAME
 from shared.logger import logger
-from shared.s3 import FILE_SYSTEM
+from shared.s3 import FILE_SYSTEM, BUCKET_PHOTO
 
 
 class AbstractUploader(ABC):

@@ -1,7 +1,12 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from s3fs import S3FileSystem
+
+from .constants import SMALL_PH, LARGE_PH, ORIGINAL_PH, PREVIEW_DIR
+
+BASE_DIR = Path(__file__).parent
 
 load_dotenv()
 
@@ -14,6 +19,18 @@ FILE_SYSTEM = S3FileSystem(
     endpoint_url=S3_URL
 )
 
+BUCKET_PHOTO = 'photos-storage'
 
-def get_photo_url():
-    pass
+ALLOWED_SIZES = (SMALL_PH, LARGE_PH, ORIGINAL_PH)
+
+
+def get_photo_url(order_id: int, photo_name: str, size: str) -> str:
+    s3_path = f'{BUCKET_PHOTO}/{order_id}/'
+    if size not in ALLOWED_SIZES:
+        raise ValueError(f'Invalid size. Allowed: {ALLOWED_SIZES}')
+    if size == ORIGINAL_PH:
+        s3_path += f'{size}/{photo_name}/'
+    else:
+        s3_path += f'{PREVIEW_DIR}/{size}/{photo_name}/'
+
+    return s3_path

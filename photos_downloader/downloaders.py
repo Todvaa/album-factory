@@ -9,9 +9,8 @@ from urllib.parse import urlparse, parse_qsl, urlencode
 import requests
 from slugify import slugify
 
-from photos_downloader.constants import (
-    SM_PH_DIR, LG_PH_DIR, ORIG_PH_DIR, PREVIEW_DIR, MODULE_NAME
-)
+from photos_downloader.constants import MODULE_NAME
+from shared.constants import PREVIEW_DIR, SMALL_PH, LARGE_PH, ORIGINAL_PH
 from shared.logger import logger
 
 
@@ -41,11 +40,11 @@ class YandexDownloader(AbstractDownloader):
         os.mkdir(self.downloads_dir)
         preview_dir = os.path.join(self.downloads_dir, PREVIEW_DIR)
         os.mkdir(preview_dir)
-        small_dir = os.path.join(preview_dir, SM_PH_DIR)
+        small_dir = os.path.join(preview_dir, SMALL_PH)
         os.mkdir(small_dir)
-        large_dir = os.path.join(preview_dir, LG_PH_DIR)
+        large_dir = os.path.join(preview_dir, LARGE_PH)
         os.mkdir(large_dir)
-        original_dir = os.path.join(self.downloads_dir, ORIG_PH_DIR)
+        original_dir = os.path.join(self.downloads_dir, ORIGINAL_PH)
         os.mkdir(original_dir)
 
         return small_dir, large_dir, original_dir
@@ -69,7 +68,7 @@ class YandexDownloader(AbstractDownloader):
         match = re.match(pattern, current_name)
         base_name = match.group('base_name')
         extension = match.group('extension')
-        while base_name + '.' + extension in os.path.join(self.downloads_dir, ORIG_PH_DIR):
+        while base_name + '.' + extension in os.path.join(self.downloads_dir, ORIGINAL_PH):
             base_name = base_name + '-'
 
         return slugify(base_name) + '.' + extension
