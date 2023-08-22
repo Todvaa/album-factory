@@ -5,14 +5,15 @@ from abc import ABC, abstractmethod
 
 from photos_processor.constants import MODULE_NAME
 from shared.logger import logger
-from shared.s3 import FILE_SYSTEM
+from shared.s3 import FILE_SYSTEM, PREVIEW_DIR, LARGE_PH
 
 
 class AbstractDownloader(ABC):
+    RECOGNITION_PATH = f'{PREVIEW_DIR}/{LARGE_PH}/'
 
     def __init__(self, order_id: int, s3_path: str):
         self.order_id = str(order_id)
-        self.s3_path = s3_path
+        self.s3_path = s3_path + f'{order_id}/' + self.RECOGNITION_PATH
         self.downloads_dir = os.path.join(tempfile.mkdtemp(''), self.order_id)
 
     @abstractmethod
