@@ -57,7 +57,6 @@ class ConfirmationCode(models.Model):
     action_type = models.CharField(
         max_length=10,
         choices=[(type.value, type.value) for type in ConfirmationType],
-        blank=False
     )
 
     class Meta:
