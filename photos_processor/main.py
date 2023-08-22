@@ -9,9 +9,9 @@ from constants import MODULE_NAME
 from downloaders import S3Downloader
 from dto import Photo
 from recognizers import Recognizer
-from shared.constants import ORIGINAL_PH, RECOGNITION_PATH
 from shared.logger import logger
 from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
+from shared.s3 import ORIGINAL_PH
 from shared.s3 import get_photo_url
 
 photos_processing_queue = RabbitQueue('photos_processing')
@@ -24,8 +24,7 @@ async def photos_processing_handler(message):
     message = json.loads(message)
     order_id = message['order_id']
     s3_path = message['s3_path']
-    download_path = s3_path + f'{order_id}/' + RECOGNITION_PATH
-    downloader = S3Downloader(order_id=order_id, s3_path=download_path)
+    downloader = S3Downloader(order_id=order_id, s3_path=s3_path)
     local_path = downloader.run()
     photos = [
         Photo(

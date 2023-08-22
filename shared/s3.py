@@ -1,18 +1,18 @@
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 from s3fs import S3FileSystem
-
-from .constants import SMALL_PH, LARGE_PH, ORIGINAL_PH, PREVIEW_DIR
-
-BASE_DIR = Path(__file__).parent
 
 load_dotenv()
 
 S3_ROOT_USER = os.getenv('S3_ROOT_USER')
 S3_ROOT_PASSWORD = os.getenv('S3_ROOT_PASSWORD')
 S3_URL = os.getenv('S3_URL')
+
+PREVIEW_DIR = 'preview'
+SMALL_PH = 'small'
+LARGE_PH = 'large'
+ORIGINAL_PH = 'original'
 
 FILE_SYSTEM = S3FileSystem(
     key=S3_ROOT_USER, secret=S3_ROOT_PASSWORD,

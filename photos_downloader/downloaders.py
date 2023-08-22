@@ -10,8 +10,8 @@ import requests
 from slugify import slugify
 
 from photos_downloader.constants import MODULE_NAME
-from shared.constants import PREVIEW_DIR, SMALL_PH, LARGE_PH, ORIGINAL_PH
 from shared.logger import logger
+from shared.s3 import PREVIEW_DIR, SMALL_PH, LARGE_PH, ORIGINAL_PH
 
 
 class AbstractDownloader(ABC):
