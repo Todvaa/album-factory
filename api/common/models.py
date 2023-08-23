@@ -6,8 +6,8 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 
-from common.utils import generate_random_passcode
 from studio.constants import CODE_LIFETIME
+from .utils import generate_random_passcode
 
 
 class ConfirmationType(Enum):
@@ -21,14 +21,10 @@ class Studio(models.Model):
     email = models.EmailField(
         max_length=255,
         unique=True,
-        blank=False,
-        null=False,
         validators=(EmailValidator(message='Incorrect email'),)
     )
     password = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     name = models.CharField(
         max_length=150,
@@ -56,15 +52,11 @@ class ConfirmationCode(models.Model):
     )
     code = models.CharField(
         max_length=6,
-        blank=False,
-        null=False,
     )
     date = models.DateTimeField(auto_now_add=True)
     action_type = models.CharField(
         max_length=10,
         choices=[(type.value, type.value) for type in ConfirmationType],
-        null=False,
-        blank=False
     )
 
     class Meta:
@@ -88,8 +80,6 @@ class ConfirmationCode(models.Model):
 class School(models.Model):
     full_name = models.CharField(
         max_length=255,
-        blank=False,
-        null=False,
     )
     studio = models.ForeignKey(
         'common.Studio',
@@ -123,8 +113,6 @@ class Order(models.Model):
     is_authenticated = True
     class_index = models.CharField(
         max_length=4,
-        blank=False,
-        null=False,
         validators=[
             RegexValidator(
                 regex=r'^(?:[1-9]|1[0-1]) [А-Я]$',
@@ -137,13 +125,9 @@ class Order(models.Model):
     )
     customer_first_name = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     customer_last_name = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     customer_middle_name = models.CharField(
         max_length=150,
@@ -164,11 +148,8 @@ class Order(models.Model):
         ]
     )
     albums_count = models.IntegerField(
-        blank=False,
-        null=False,
     )
     passcode = models.IntegerField(
-        null=False,
         default=generate_random_passcode
     )
     status = models.CharField(
@@ -177,12 +158,12 @@ class Order(models.Model):
         default=OrderStatus.created.name
     )
     studio = models.ForeignKey(
-        'common.Studio',
+        'Studio',
         on_delete=models.CASCADE,
         related_name='order'
     )
     school = models.ForeignKey(
-        'common.School',
+        'School',
         on_delete=models.CASCADE,
         related_name='order',
         blank=True,
@@ -201,13 +182,9 @@ class Order(models.Model):
 class PersonStaff(models.Model):
     last_name = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     first_name = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     middle_name = models.CharField(
         max_length=150,
@@ -216,16 +193,12 @@ class PersonStaff(models.Model):
     )
     school_subject = models.CharField(
         max_length=150,
-        blank=False,
-        null=False,
     )
     photo = models.ImageField(
         upload_to='person_staff_photo/',
-        blank=False,
-        null=False,
     )
     school = models.ForeignKey(
-        'common.School',
+        'School',
         on_delete=models.CASCADE,
         related_name='person_staff'
     )
@@ -238,3 +211,111 @@ class PersonStaff(models.Model):
             f'{self.last_name} / {self.school.full_name}'
             f' / {self.school_subject}'
         )
+
+
+class PhotoType(Enum):
+    STAGED = 'staged'
+    REPORTAGE = 'reportage'
+
+
+class Photo(models.Model):
+    order = models.ForeignKey(
+        'Order',
+        on_delete=models.CASCADE,
+    )
+    s3_url = models.CharField(
+        max_length=255,
+        unique=True
+    )
+    faces_count = models.IntegerField(
+    )
+    focus = models.FloatField(
+        null=True,
+        blank=True
+    )
+    description = models.TextField(
+        null=True,
+        blank=True
+    )
+    type = models.CharField(
+        max_length=10,
+        choices=[(type.value, type.value) for type in PhotoType],
+        null=True,
+        blank=True
+    )
+    horizont = models.IntegerField(
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.id} / {self.s3_url}'
+
+
+class PersonStudent(models.Model):
+    name = models.CharField(
+        max_length=255,
+    )
+    vector = models.TextField(
+    )
+    order = models.ForeignKey(
+        'Order',
+        on_delete=models.CASCADE,
+    )
+    main_photo = models.ForeignKey(
+        'Photo',
+        on_delete=models.CASCADE,
+        related_name='main_photo',
+    )
+    photos = models.ManyToManyField(
+        Photo,
+        through='PhotoPersonStudent',
+        verbose_name='student photos',
+        related_name='photo'
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.id} / {self.name}'
+
+
+class PhotoPersonStudent(models.Model):
+    photo = models.ForeignKey(
+        'Photo',
+        verbose_name='photo',
+        on_delete=models.CASCADE
+    )
+    person_student = models.ForeignKey(
+        'PersonStudent',
+        verbose_name='person_student',
+        on_delete=models.CASCADE
+    )
+    face_fill_percent = models.IntegerField(
+        null=True,
+        blank=True
+    )
+    blink = models.BooleanField(
+        null=True,
+        blank=True
+    )
+    look_to_camera = models.BooleanField(
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['photo', 'person_student'],
+                name='unique pair for photo and person_student'
+            )
+        ]
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.photo.s3_url} / {self.person_student.name}'

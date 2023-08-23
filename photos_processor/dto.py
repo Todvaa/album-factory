@@ -13,7 +13,7 @@ class Photo:
 
 
 class Person:
-    def __init__(self, file_name, vector):
+    def __init__(self, file_name: str, vector):
         self.photo_names = [file_name]
         self.vectors = [vector]
         self.average_vector = None
@@ -21,7 +21,7 @@ class Person:
     def __calculate_avg_vector(self):
         self.average_vector = sum(self.vectors) / len(self.vectors)
 
-    def add_photo(self, file_name, vector):
+    def add_photo(self, file_name: str, vector):
         self.photo_names.append(file_name)
         self.vectors.append(vector)
         self.__calculate_avg_vector()
