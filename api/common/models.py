@@ -227,8 +227,7 @@ class Photo(models.Model):
         max_length=255,
         unique=True
     )
-    faces_count = models.IntegerField(
-    )
+    faces_count = models.IntegerField()
     focus = models.FloatField(
         null=True,
         blank=True
