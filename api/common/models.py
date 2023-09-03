@@ -137,6 +137,7 @@ class Order(models.Model):
     phone_number = models.CharField(
         max_length=10,
         null=True,
+        blank=True,
         validators=[
             RegexValidator(
                 regex=r'^9\d{9}$',
@@ -155,7 +156,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=25,
         choices=[(status.name, status.value) for status in OrderStatus],
-        default=OrderStatus.created.name
+        default=OrderStatus.created.name,
     )
     studio = models.ForeignKey(
         'Studio',
@@ -257,9 +258,9 @@ class Photo(models.Model):
 class PersonStudent(models.Model):
     name = models.CharField(
         max_length=255,
+        null=True,
     )
-    vector = models.TextField(
-    )
+    vector = models.JSONField()
     order = models.ForeignKey(
         'Order',
         on_delete=models.CASCADE,

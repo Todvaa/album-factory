@@ -54,7 +54,7 @@ async def photos_processing_handler(message):
         ],
         'persons': [
             {
-                'photos': person.photo_names,
+                'photos_s3_path': person.photos_s3_path,
                 'vector': person.average_vector
             } for person in persons
         ]
