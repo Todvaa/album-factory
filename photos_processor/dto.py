@@ -23,10 +23,10 @@ class Person:
     def __init__(self, photo_s3_path: str, vector):
         self.photos_s3_path: List[str] = [photo_s3_path]
         self.vectors: list = [vector]
-        self.average_vector = None
+        self.average_vector: list = list(vector)
 
     def __calculate_avg_vector(self):
-        self.average_vector = sum(self.vectors) / len(self.vectors)
+        self.average_vector = list(sum(self.vectors) / len(self.vectors))
 
     def add_photo(self, photo_s3_path: str, vector):
         self.photos_s3_path.append(photo_s3_path)

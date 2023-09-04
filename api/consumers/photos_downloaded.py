@@ -3,7 +3,7 @@ import json
 from propan.brokers.rabbit import RabbitQueue
 
 from common.models import OrderStatus
-from consumers.utils import change_order_status
+from consumers.utils import change_order_status_async
 from shared.logger import logger
 from shared.queue import exchange, rabbitmq_broker
 
@@ -19,7 +19,7 @@ def init():
 async def photos_downloaded_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    change_order_status(
+    await change_order_status_async(
         module_name=MODULE_NAME,
         order_id=message['order_id'],
         new_status=OrderStatus.portraits_processing.name
