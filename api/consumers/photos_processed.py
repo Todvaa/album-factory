@@ -1,12 +1,11 @@
 import json
 
 from asgiref.sync import sync_to_async
-from django.db import IntegrityError
 from django.db.models import Q
 from propan.brokers.rabbit import RabbitQueue
 
+from common.data_storages import OrderDataStorage
 from common.models import OrderStatus, Photo, PersonStudent, Order, PhotoPersonStudent, Template
-from consumers.utils import change_order_status_async
 from shared.logger import logger
 from shared.queue import exchange, rabbitmq_broker, get_rabbitmq_broker
 
@@ -34,18 +33,10 @@ def photos_entities_create(order_id: int, images_data: dict):
             type=image_data['type'],
             horizont=image_data['horizont']
         ) for image_data in images_data]
-    try:
-        Photo.objects.bulk_create(photos_to_create)
-        logger.info(
-            module=MODULE_NAME, message=f'{len(photos_to_create)} entities created'
-        )
-    except IntegrityError as error:
-        logger.info(
-            module=MODULE_NAME, message=f'Photo already exist {str(error)}'
-        )
-
-
-photos_entities_create_async = sync_to_async(photos_entities_create)
+    Photo.objects.bulk_create(photos_to_create)
+    logger.info(
+        module=MODULE_NAME, message=f'{len(photos_to_create)} entities created'
+    )
 
 
 def person_student_entities_create(order_id: int, persons_data: dict):
@@ -69,20 +60,11 @@ def person_student_entities_create(order_id: int, persons_data: dict):
                     person_student=person,
                 )
             )
-    try:
-        PersonStudent.objects.bulk_create(persons_to_create)
-        PhotoPersonStudent.objects.bulk_create(photo_person_students_to_create)
-        logger.info(
-            module=MODULE_NAME, message=f'{len(persons_to_create)} entities created'
-        )
-    except IntegrityError as error:
-        logger.info(
-            module=MODULE_NAME,
-            message=f'PersonStudent or PhotoPersonStudent already exist {str(error)}'
-        )
-
-
-person_student_entities_create_async = sync_to_async(person_student_entities_create)
+    PersonStudent.objects.bulk_create(persons_to_create)
+    PhotoPersonStudent.objects.bulk_create(photo_person_students_to_create)
+    logger.info(
+        module=MODULE_NAME, message=f'{len(persons_to_create)} entities created'
+    )
 
 
 def add_templates(message: dict):
@@ -95,40 +77,42 @@ def add_templates(message: dict):
     message['templates'] = [template.to_dict() for template in templates]
     logger.info(
         module=MODULE_NAME,
-        message=f'Templates added'
+        message=f'templates added'
     )
 
     return message
 
 
-add_templates_async = sync_to_async(add_templates)
+def handle(message: dict) -> dict:
+    order = Order.objects.get(id=message['order_id'])
+    OrderDataStorage.change_status(
+        order=order,
+        status=OrderStatus.portraits_processed,
+        module_name=MODULE_NAME
+    )
+    photos_entities_create(
+        order_id=message['order_id'],
+        images_data=message['images']
+    )
+    person_student_entities_create(
+        order_id=message['order_id'],
+        persons_data=message['persons']
+    )
+    message = add_templates(message=message)
+
+    return message
+
+
+handle_async = sync_to_async(handle)
 
 
 @rabbitmq_broker.handle(photos_processed_queue, exchange, retry=True)
 async def photos_processed_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    order_id = message['order_id']
-    await change_order_status_async(
-        module_name=MODULE_NAME,
-        order_id=order_id,
-        new_status=OrderStatus.portraits_processed.name
-    )
-
-    await photos_entities_create_async(
-        order_id=order_id,
-        images_data=message['images']
-    )
-
-    await person_student_entities_create_async(
-        order_id=order_id,
-        persons_data=message['persons']
-    )
-
-    message = await add_templates_async(
+    await handle_async(
         message=message
     )
-
     await publish_templates(message=message)
     logger.info(module=MODULE_NAME, message=f'message handled')
 

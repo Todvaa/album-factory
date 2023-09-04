@@ -1,9 +1,10 @@
 import json
 
+from asgiref.sync import sync_to_async
 from propan.brokers.rabbit import RabbitQueue
 
-from common.models import OrderStatus
-from consumers.utils import change_order_status_async
+from common.data_storages import OrderDataStorage
+from common.models import OrderStatus, Order
 from shared.logger import logger
 from shared.queue import exchange, rabbitmq_broker
 
@@ -15,12 +16,22 @@ def init():
     pass
 
 
+def handle(message: dict):
+    order = Order.objects.get(id=message['order_id'])
+    OrderDataStorage.change_status(
+        order=order,
+        status=OrderStatus.portraits_processing,
+        module_name=MODULE_NAME
+    )
+
+
+handle_async = sync_to_async(handle)
+
+
 @rabbitmq_broker.handle(photos_downloaded_queue, exchange, retry=True)
 async def photos_downloaded_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    await change_order_status_async(
-        module_name=MODULE_NAME,
-        order_id=message['order_id'],
-        new_status=OrderStatus.portraits_processing.name
+    await handle_async(
+        message=message
     )
