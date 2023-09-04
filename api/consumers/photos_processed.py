@@ -1,6 +1,7 @@
 import json
 
 from asgiref.sync import sync_to_async
+from django.db import transaction
 from django.db.models import Q
 from propan.brokers.rabbit import RabbitQueue
 
@@ -18,11 +19,10 @@ def init():
     pass
 
 
-def photos_entities_create(order_id: int, images_data: dict):
+def photos_entities_create(order: Order, images_data: dict):
     logger.info(
-        module=MODULE_NAME, message='Creation of Photo entities has begun'
+        module=MODULE_NAME, message='creation of Photo entities has begun'
     )
-    order = Order.objects.get(id=order_id)
     photos_to_create = [
         Photo(
             order=order,
@@ -35,15 +35,15 @@ def photos_entities_create(order_id: int, images_data: dict):
         ) for image_data in images_data]
     Photo.objects.bulk_create(photos_to_create)
     logger.info(
-        module=MODULE_NAME, message=f'{len(photos_to_create)} entities created'
+        module=MODULE_NAME,
+        message=f'{len(photos_to_create)} entities added to transaction'
     )
 
 
-def person_student_entities_create(order_id: int, persons_data: dict):
+def person_student_entities_create(order: Order, persons_data: dict):
     logger.info(
-        module=MODULE_NAME, message='Creation of PersonStudent entities has begun'
+        module=MODULE_NAME, message='creation of PersonStudent entities has begun'
     )
-    order = Order.objects.get(id=order_id)
     persons_to_create = []
     photo_person_students_to_create = []
     for person_data in persons_data:
@@ -63,7 +63,8 @@ def person_student_entities_create(order_id: int, persons_data: dict):
     PersonStudent.objects.bulk_create(persons_to_create)
     PhotoPersonStudent.objects.bulk_create(photo_person_students_to_create)
     logger.info(
-        module=MODULE_NAME, message=f'{len(persons_to_create)} entities created'
+        module=MODULE_NAME,
+        message=f'{len(persons_to_create)} entities added to transaction'
     )
 
 
@@ -83,6 +84,7 @@ def add_templates(message: dict):
     return message
 
 
+@transaction.atomic
 def handle(message: dict) -> dict:
     order = Order.objects.get(id=message['order_id'])
     OrderDataStorage.change_status(
@@ -91,11 +93,11 @@ def handle(message: dict) -> dict:
         module_name=MODULE_NAME
     )
     photos_entities_create(
-        order_id=message['order_id'],
+        order=order,
         images_data=message['images']
     )
     person_student_entities_create(
-        order_id=message['order_id'],
+        order=order,
         persons_data=message['persons']
     )
     message = add_templates(message=message)
@@ -112,6 +114,10 @@ async def photos_processed_handler(message):
     message = json.loads(message)
     await handle_async(
         message=message
+    )
+    logger.info(
+        module=MODULE_NAME,
+        message='transaction completed'
     )
     await publish_templates(message=message)
     logger.info(module=MODULE_NAME, message=f'message handled')
