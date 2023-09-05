@@ -319,3 +319,42 @@ class PhotoPersonStudent(models.Model):
 
     def __str__(self):
         return f'{self.photo.s3_url} / {self.person_student.name}'
+
+
+class AbstractLayout(models.Model):
+    cover = models.TextField()
+    portrait_student_single = models.TextField()
+    portrait_student_multi = models.TextField()
+    portrait_staff_multi = models.TextField()
+    gallery = models.TextField()
+
+    class Meta:
+        abstract = True
+
+
+class Template(AbstractLayout):
+    name = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    public = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.id} / {self.name}'
+
+
+class Layout(AbstractLayout):
+    order = models.OneToOneField(
+        'Order',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f'id: {self.id} / order_id: {self.order.id}'
