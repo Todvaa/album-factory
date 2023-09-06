@@ -1,9 +1,16 @@
+from typing import Optional
+
+
 class Photo:
-    def __init__(self, name, remote_url):
-        self.name = name
-        self.face_count = 0
-        self.remote_url = remote_url
-        self.vectors = []
+    def __init__(self, name: str, remote_url: str):
+        self.name: str = name
+        self.face_count: int = 0
+        self.remote_url: str = remote_url
+        self.vectors: list = []
+        self.focus: Optional[float] = None
+        self.description: Optional[str] = None
+        self.type: Optional[str] = None
+        self.horizont: Optional[int] = None
 
     def append_vector(self, vector):
         self.vectors.append(vector)

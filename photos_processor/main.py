@@ -45,7 +45,11 @@ async def photos_processing_handler(message):
         'images': [
             {
                 's3_url': photo.remote_url,
-                'face_count': photo.face_count
+                'face_count': photo.face_count,
+                'focus': photo.focus,
+                'description': photo.description,
+                'type': photo.type,
+                'horizont': photo.horizont,
             } for photo in photos
         ],
         'persons': [
