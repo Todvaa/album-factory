@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 from asgiref.sync import sync_to_async
 from django.db import transaction
@@ -8,9 +9,11 @@ from propan.brokers.rabbit import RabbitQueue
 from common.data_storages import OrderDataStorage
 from common.models import OrderStatus, Photo, PersonStudent, Order, PhotoPersonStudent, Template
 from shared.logger import logger
-from shared.queue import exchange, rabbitmq_broker, get_rabbitmq_broker
+from shared.queue import (
+    exchange, rabbitmq_broker, get_rabbitmq_broker, RETRY_COUNT
+)
 
-MODULE_NAME = 'PHOTOS_PROCESSED'
+MODULE_NAME = 'CONSUMER_PHOTOS_PROCESSED'
 photos_processed_queue = RabbitQueue('photos_processed')
 layouts_generation_queue = RabbitQueue('layouts_generation')
 
@@ -68,29 +71,29 @@ def person_student_entities_create(order: Order, persons_data: dict):
     )
 
 
-def add_templates(message: dict):
-    order = Order.objects.get(id=message['order_id'])
-    # private_templates = Template.objects.filter(studio=order.studio, public=False)
-    # public_templates = Template.objects.filter(public=True)
-    # templates = private_templates.union(public_templates)
+def get_templates(order: Order) -> List[dict]:
     query = Q(studio=order.studio, public=False) | Q(public=True)
     templates = Template.objects.filter(query)
-    message['templates'] = [template.to_dict() for template in templates]
     logger.info(
         module=MODULE_NAME,
-        message=f'templates added'
+        message=f'got templates'
     )
 
-    return message
+    return [template.to_dict() for template in templates]
 
 
 @transaction.atomic
 def handle(message: dict) -> dict:
-    order = Order.objects.get(id=message['order_id'])
+    try:
+        order = Order.objects.get(id=message['order_id'])
+    except Order.DoesNotExist as error:
+        logger.info(
+            module=MODULE_NAME,
+            message=f'could not find order by ID. Error{str(error)}'
+        )
     OrderDataStorage.change_status(
         order=order,
         status=OrderStatus.portraits_processed,
-        module_name=MODULE_NAME
     )
     photos_entities_create(
         order=order,
@@ -100,7 +103,8 @@ def handle(message: dict) -> dict:
         order=order,
         persons_data=message['persons']
     )
-    message = add_templates(message=message)
+    templates = get_templates(order=order)
+    message['templates'] = templates
 
     return message
 
@@ -108,11 +112,11 @@ def handle(message: dict) -> dict:
 handle_async = sync_to_async(handle)
 
 
-@rabbitmq_broker.handle(photos_processed_queue, exchange, retry=True)
+@rabbitmq_broker.handle(photos_processed_queue, exchange, retry=RETRY_COUNT)
 async def photos_processed_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    await handle_async(
+    message = await handle_async(
         message=message
     )
     logger.info(

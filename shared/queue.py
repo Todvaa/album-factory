@@ -12,6 +12,8 @@ RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
 exchange = RabbitExchange('album_factory_exchange', type=ExchangeType.DIRECT)
 
+RETRY_COUNT = 5
+
 
 def get_rabbitmq_broker() -> RabbitBroker:
     return RabbitBroker(

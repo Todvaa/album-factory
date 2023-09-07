@@ -10,7 +10,9 @@ from downloaders import S3Downloader
 from dto import Photo
 from recognizers import Recognizer
 from shared.logger import logger
-from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
+from shared.queue import (
+    rabbitmq_broker, app, exchange, get_rabbitmq_broker, RETRY_COUNT
+)
 from shared.s3 import ORIGINAL_PH
 from shared.s3 import get_photo_url
 
@@ -18,7 +20,7 @@ photos_processing_queue = RabbitQueue('photos_processing')
 photos_processed_queue = RabbitQueue('photos_processed')
 
 
-@rabbitmq_broker.handle(photos_processing_queue, exchange, retry=True)
+@rabbitmq_broker.handle(photos_processing_queue, exchange, retry=RETRY_COUNT)
 async def photos_processing_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
