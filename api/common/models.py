@@ -321,7 +321,7 @@ class PhotoPersonStudent(models.Model):
         return f'{self.photo.s3_url} / {self.person_student.name}'
 
 
-class AbstractBaseModel(models.Model):
+class AbstractLayout(models.Model):
     cover = models.TextField()
     portrait_student_single = models.TextField()
     portrait_student_multi = models.TextField()
@@ -332,17 +332,11 @@ class AbstractBaseModel(models.Model):
         abstract = True
 
 
-class Template(AbstractBaseModel):
+class Template(AbstractLayout):
     name = models.CharField(
         max_length=255,
         null=True,
         blank=True
-    )
-    studio = models.ForeignKey(
-        'Studio',
-        on_delete=models.CASCADE,
-        related_name='template',
-        null=True
     )
     public = models.BooleanField(default=False)
 
@@ -352,20 +346,8 @@ class Template(AbstractBaseModel):
     def __str__(self):
         return f'{self.id} / {self.name}'
 
-    def to_dict(self):
-        return {
-            'cover': self.cover,
-            'portrait_student_single': self.portrait_student_single,
-            'portrait_student_multi': self.portrait_student_multi,
-            'portrait_staff_multi': self.portrait_staff_multi,
-            'gallery': self.gallery,
-            'name': self.name,
-            'studio': None if self.studio is None else str(self.studio),
-            'public': self.public
-        }
 
-
-class Layout(AbstractBaseModel):
+class Layout(AbstractLayout):
     order = models.OneToOneField(
         'Order',
         on_delete=models.CASCADE,
