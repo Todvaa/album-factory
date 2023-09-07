@@ -338,6 +338,12 @@ class Template(AbstractLayout):
         null=True,
         blank=True
     )
+    studio = models.ForeignKey(
+        'Studio',
+        on_delete=models.CASCADE,
+        related_name='template',
+        null=True
+    )
     public = models.BooleanField(default=False)
 
     class Meta:
@@ -345,6 +351,18 @@ class Template(AbstractLayout):
 
     def __str__(self):
         return f'{self.id} / {self.name}'
+
+    def to_dict(self):
+        return {
+            'cover': self.cover,
+            'portrait_student_single': self.portrait_student_single,
+            'portrait_student_multi': self.portrait_student_multi,
+            'portrait_staff_multi': self.portrait_staff_multi,
+            'gallery': self.gallery,
+            'name': self.name,
+            'studio': None if self.studio is None else str(self.studio),
+            'public': self.public
+        }
 
 
 class Layout(AbstractLayout):

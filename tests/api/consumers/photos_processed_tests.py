@@ -8,7 +8,7 @@ from tests.api.factories import StudioFactory, TemplateFactory, OrderFactory
 
 class PhotoProcessedTest(unittest.TestCase):
     @pytest.mark.django_db
-    def test_add_templates(self):
+    def test_get_templates(self):
         studio = StudioFactory()
         order = OrderFactory(studio=studio)
         other_studio = StudioFactory()
