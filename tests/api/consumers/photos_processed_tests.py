@@ -12,10 +12,13 @@ class PhotoProcessedTest(unittest.TestCase):
         studio = StudioFactory()
         order = OrderFactory(studio=studio)
         other_studio = StudioFactory()
-        TemplateFactory.create_batch(10)
-        TemplateFactory.create_batch(5, studio=other_studio)
-        TemplateFactory.create_batch(5, studio=other_studio, public=False)
-        TemplateFactory.create_batch(5, studio=studio)
-        TemplateFactory.create_batch(5, studio=studio, public=False)
+        # must find
+        TemplateFactory(public=True)
+        TemplateFactory.create_batch(2, studio=other_studio, public=True)
+        TemplateFactory.create_batch(4, studio=studio, public=True)
+        TemplateFactory.create_batch(8, studio=studio)
+        # must not find
+        TemplateFactory.create_batch(16, studio=other_studio)
+
         templates = get_templates(order=order)
-        self.assertEqual(len(templates), 25)
+        self.assertEqual(len(templates), 15)

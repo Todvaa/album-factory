@@ -116,14 +116,12 @@ handle_async = sync_to_async(handle)
 async def photos_processed_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    message = await handle_async(
-        message=message
-    )
+    message = await handle_async(message)
     logger.info(
         module=MODULE_NAME,
         message='transaction completed'
     )
-    await publish_templates(message=message)
+    await publish_templates(message)
     logger.info(module=MODULE_NAME, message=f'message handled')
 
 

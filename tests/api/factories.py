@@ -75,7 +75,7 @@ class TemplateFactory(factory.django.DjangoModelFactory):
         model = Template
 
     name = factory.LazyAttribute(lambda _: fake.word())
-    public = True
+    public = False
     cover = factory.Faker('text')
     portrait_student_single = factory.Faker('text')
     portrait_student_multi = factory.Faker('text')

@@ -33,6 +33,4 @@ handle_async = sync_to_async(handle)
 async def photos_downloaded_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
-    await handle_async(
-        message=message
-    )
+    await handle_async(message)
