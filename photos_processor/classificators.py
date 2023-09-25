@@ -25,13 +25,13 @@ class Classificator(AbstractClassificator):
         persons = []
         while len(unclassified_photos) != 0:
             first_photo = unclassified_photos.pop()
-            first_file, first_vector = first_photo.name, first_photo.vectors[0]
-            person = Person(file_name=first_file, vector=first_vector)
+            first_s3_path, first_vector = first_photo.remote_url, first_photo.vectors[0]
+            person = Person(photo_s3_path=first_s3_path, vector=first_vector)
             to_remove = []
             for index, second_photo in enumerate(unclassified_photos):
-                second_file, second_vector = second_photo.name, second_photo.vectors[0]
+                second_s3_path, second_vector = second_photo.remote_url, second_photo.vectors[0]
                 if pdist([first_vector, second_vector], 'euclidean') < EQUALITY_FACTOR:
-                    person.add_photo(file_name=second_file, vector=second_vector)
+                    person.add_photo(photo_s3_path=second_s3_path, vector=second_vector)
                     to_remove.append(index)
 
             for index in reversed(to_remove):

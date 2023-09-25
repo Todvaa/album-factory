@@ -74,6 +74,30 @@ services:
     env_file:
       - .env
 
+  photos_downloaded:
+    build:
+      dockerfile: docker/photos_downloaded/Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - queue
+      - minio
+      - db
+    env_file:
+      - .env
+
+  photos_processed:
+    build:
+      dockerfile: docker/photos_processed/Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - queue
+      - minio
+      - db
+    env_file:
+      - .env
+
   nginx:
     image: nginx:1.19.3
     restart: always

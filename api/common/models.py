@@ -82,7 +82,7 @@ class School(models.Model):
         max_length=255,
     )
     studio = models.ForeignKey(
-        'common.Studio',
+        'Studio',
         on_delete=models.CASCADE,
         related_name='school'
     )
@@ -137,6 +137,7 @@ class Order(models.Model):
     phone_number = models.CharField(
         max_length=10,
         null=True,
+        blank=True,
         validators=[
             RegexValidator(
                 regex=r'^9\d{9}$',
@@ -155,7 +156,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=25,
         choices=[(status.name, status.value) for status in OrderStatus],
-        default=OrderStatus.created.name
+        default=OrderStatus.created.name,
     )
     studio = models.ForeignKey(
         'Studio',
@@ -257,9 +258,9 @@ class Photo(models.Model):
 class PersonStudent(models.Model):
     name = models.CharField(
         max_length=255,
+        null=True,
     )
-    vector = models.TextField(
-    )
+    vector = models.JSONField()
     order = models.ForeignKey(
         'Order',
         on_delete=models.CASCADE,
@@ -337,6 +338,12 @@ class Template(AbstractLayout):
         null=True,
         blank=True
     )
+    studio = models.ForeignKey(
+        'Studio',
+        on_delete=models.CASCADE,
+        related_name='template',
+        null=True
+    )
     public = models.BooleanField(default=False)
 
     class Meta:
@@ -344,6 +351,18 @@ class Template(AbstractLayout):
 
     def __str__(self):
         return f'{self.id} / {self.name}'
+
+    def to_dict(self):
+        return {
+            'cover': self.cover,
+            'portrait_student_single': self.portrait_student_single,
+            'portrait_student_multi': self.portrait_student_multi,
+            'portrait_staff_multi': self.portrait_staff_multi,
+            'gallery': self.gallery,
+            'name': self.name,
+            'studio': None if self.studio is None else str(self.studio),
+            'public': self.public
+        }
 
 
 class Layout(AbstractLayout):

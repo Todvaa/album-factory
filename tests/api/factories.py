@@ -4,7 +4,9 @@ import factory
 from django.db import models
 from django.utils import timezone
 
-from common.models import Studio, ConfirmationCode, School, OrderStatus, Order
+from common.models import (
+    Studio, ConfirmationCode, School, OrderStatus, Order, Template
+)
 from tests.utils import fake
 
 
@@ -66,3 +68,18 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     studio = factory.SubFactory(StudioFactory)
     school = factory.SubFactory(SchoolFactory)
+
+
+class TemplateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Template
+
+    name = factory.LazyAttribute(lambda _: fake.word())
+    public = False
+    cover = factory.Faker('text')
+    portrait_student_single = factory.Faker('text')
+    portrait_student_multi = factory.Faker('text')
+    portrait_staff_multi = factory.Faker('text')
+    gallery = factory.Faker('text')
+
+    studio = factory.SubFactory(StudioFactory)

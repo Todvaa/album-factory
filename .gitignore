@@ -169,5 +169,5 @@ pg_notify/
 pg_serial/
 pg_subtrans/
 /api/static/
-/api/studio/shared/
+/api/shared/
 /photos_processor/test_photos/

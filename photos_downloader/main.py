@@ -7,7 +7,9 @@ from photos_downloader.constants import MODULE_NAME
 from photos_downloader.downloaders import YandexDownloader
 from photos_downloader.uploaders import S3Uploader
 from shared.logger import logger
-from shared.queue import rabbitmq_broker, app, exchange, get_rabbitmq_broker
+from shared.queue import (
+    rabbitmq_broker, app, exchange, get_rabbitmq_broker, RETRY_COUNT
+)
 
 photos_downloading_queue = RabbitQueue('photos_downloading')
 photos_downloaded_queue = RabbitQueue('photos_downloaded')
@@ -15,7 +17,7 @@ photos_processing_queue = RabbitQueue('photos_processing')
 
 
 # todo: For more complex use-cases just use the tenacity library for retry.
-@rabbitmq_broker.handle(photos_downloading_queue, exchange, retry=True)
+@rabbitmq_broker.handle(photos_downloading_queue, exchange, retry=RETRY_COUNT)
 async def photos_downloading_handler(message):
     logger.info(module=MODULE_NAME, message=f'got message: {message}')
     message = json.loads(message)
