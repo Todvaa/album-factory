@@ -93,8 +93,10 @@ class StudioTokenObtainPairView(GenericAPIView):
 
 
 class MeView(GenericAPIView):
+    serializer_class = StudioSerializer
+
     def get(self, request):
-        return Response(StudioSerializer(request.user).data)
+        return Response(self.serializer_class(request.user).data)
 
 
 class ConfirmationSendView(GenericAPIView):

@@ -38,5 +38,7 @@ class CustomerSignInView(GenericAPIView):
 
 
 class MeView(GenericAPIView):
+    serializer_class = OrderSerializer
+
     def get(self, request):
-        return Response(OrderSerializer(request.user).data)
+        return Response(self.serializer_class(request.user).data)
