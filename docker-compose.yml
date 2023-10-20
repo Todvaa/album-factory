@@ -33,9 +33,9 @@ services:
     env_file:
       - .env
 
-  api:
+  data_controller:
     build:
-      dockerfile: docker/api/Dockerfile
+      dockerfile: docker/data_controller/Dockerfile
       context: .
     restart: always
     volumes:
@@ -108,7 +108,7 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - api
+      - data_controller
 
   minio:
     image: bitnami/minio:2023.6.23-debian-11-r2

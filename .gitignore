@@ -168,6 +168,6 @@ pg_tblspc/
 pg_notify/
 pg_serial/
 pg_subtrans/
-/api/static/
-/api/shared/
+/data_controller/static/
+/data_controller/shared/
 /photos_processor/test_photos/

@@ -1,4 +1,4 @@
 #!/bin/bash
 python /app/manage.py migrate --noinput
 python /app/manage.py collectstatic --noinput
-gunicorn --bind 0.0.0.0:8000 api.wsgi
+gunicorn --bind 0.0.0.0:8000 data_controller.wsgi

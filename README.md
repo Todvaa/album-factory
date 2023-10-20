@@ -30,7 +30,7 @@ APP_ENV=dev
 ## Документация OpenApi 3
 Генерация локального файла:
 ```commandline
-./api/manage.py generateschema --file ../api.yml
+python manage.py generateschema --file ../api.yml
 ```
 Веб интерфейс: http://localhost/openapi
 
