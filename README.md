@@ -13,17 +13,17 @@ Photo studios produce thousands of albums yearly. This project helps to automate
 - Editor for album review
 
 ## Structure
-- Order controller + api <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/api/README.md)>  
+- Order controller + api <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/data_controller/README.md)>  
 Aggregated service to provide data to front via api and control order/album state
 - Downloader <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/photos_downloader/README.md)>  
 Gets photos from remote sources
 - Processor <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/photos_processor/README.md)>  
 Recognises and classifies photos
-- Db 
+- Db  
 Domain entity storage
-- S3 
+- S3  
 Photos storage
-- Queue 
+- Queue  
 Interservice messaging
 - Cache
 - Web server
@@ -41,17 +41,20 @@ POSTGRES_USER=album_factory
 POSTGRES_PASSWORD=album_factory
 DB_HOST=db # database container name
 DB_PORT=5432
-SECRET_KEY= # Django secret key
+
 RABBITMQ_DEFAULT_USER=album_factory
 RABBITMQ_DEFAULT_PASS=album_factory
 RABBITMQ_PORT=5672
+
 MINIO_ROOT_USER=album_factory
 MINIO_ROOT_PASSWORD=album_factory
 MINIO_PORT=9000
+
 #dev/test/prod
 APP_ENV=dev
+SECRET_KEY= # Django secret key
 ```
-3. Collect containers. Run from the docker folder.
+3. Collect containers.
 <br><pre>docker-compose up --build</pre><br>
 
 ## OpenApi 3 documentation
