@@ -35,24 +35,29 @@ Interservice messaging
 2. Create and fill in ".env"
 <br><pre>cp .env.dist .env</pre><br>
 ```
+APP_ENV=dev # dev/test/prod
+SECRET_KEY= # Django secret key
+TTL=1
+
 DB_ENGINE=django.db.backends.postgresql
 DB_NAME=album_factory
 POSTGRES_USER=album_factory
 POSTGRES_PASSWORD=album_factory
 DB_HOST=db # database container name
+DB_EXTERNAL_PORT=5432
 DB_PORT=5432
 
 RABBITMQ_DEFAULT_USER=album_factory
 RABBITMQ_DEFAULT_PASS=album_factory
+RABBITMQ_HOST=queue
 RABBITMQ_PORT=5672
 
-MINIO_ROOT_USER=album_factory
-MINIO_ROOT_PASSWORD=album_factory
-MINIO_PORT=9000
-
-#dev/test/prod
-APP_ENV=dev
-SECRET_KEY= # Django secret key
+S3_ROOT_USER=album_factory
+S3_ROOT_PASSWORD=album_factory
+S3_PORT=9000
+S3_WEB_PORT=9001
+S3_HOST=minio
+S3_URL=http://${S3_HOST}:${S3_PORT}
 ```
 3. Collect containers.
 <br><pre>docker-compose up --build</pre><br>
