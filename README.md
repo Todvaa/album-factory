@@ -13,6 +13,8 @@ Photo studios produce thousands of albums yearly. This project helps to automate
 - Editor for album review
 
 ## Structure
+<img width="1037" alt="Screenshot 2023-10-21 at 9 41 16 AM" src="https://github.com/Todvaa/album-factory/assets/109280151/dd2d3d85-434c-45ba-a999-f12bc17f4207">
+
 - Order controller + api <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/data_controller/README.md)>  
 Aggregated service to provide data to front via api and control order/album state
 - Downloader <[ReadMe](https://github.com/Todvaa/album-factory/blob/master/photos_downloader/README.md)>  
@@ -27,7 +29,7 @@ Photos storage
 Interservice messaging
 - Cache
 - Web server
-
+ 
 ## Launch
 1. Install:
 * <a href=https://www.docker.com/get-started>Docker</a>
