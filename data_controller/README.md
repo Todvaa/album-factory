@@ -1,11 +1,13 @@
 # Album factory Backend Data Controller
+## Description  
+The service provides two interfaces.  
 
-## Api
+### Api
 Two types of authorization. For the studio and for their customers ("Studio" and "Order" entities).
 Both authorizations used JWT. Studios can add "School" and "Order" entities.
 The password for customer authorization is generated and issued by the Studio
 
-## Connsumers
+### Connsumers
 #### photos_downloaded
 Receives the "order photos downloaded" event.
 Changes the order status to "portraits_processing".
